@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>ee56cbd8-24ed-4f13-ad8d-b049a9d91a69</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>PicDedupe.Shared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Misc\ExtendedDirectoryInfo.vb" />
+    <Compile Include="$(MSBuildThisFileDirectory)Misc\FileCrawler.vb" />
+    <Compile Include="..\PicDedupe.Shared\Controls\FolderListView.vb" />
+    <Compile Include="$(MSBuildThisFileDirectory)Misc\MemorySize.vb" />
+  </ItemGroup>
+</Project>
