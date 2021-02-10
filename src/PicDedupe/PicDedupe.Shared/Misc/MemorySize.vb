@@ -2,7 +2,7 @@
 
 Public Structure MemorySize
 
-    Private ReadOnly _size As ULong ' An ULong can represent a maximum of 16 Exabytes.
+    Private _size As ULong ' An ULong can represent a maximum of 16 Exabytes.
 
     Private Shared ReadOnly s_units As String() =
         {"Bytes", "Kilobytes", "MegaBytes", "Gigabytes", "Terabytes", "Petabytes", "Exabytes"}
@@ -10,7 +10,7 @@ Public Structure MemorySize
     Private Shared ReadOnly s_decimalPlacecFormatStrings As String() =
         {"#,##0", "#,##0.0", "#,##0.00", "#,##0.000", "#,##0.0000", "#,##0.00000"}
 
-    Private Shared ReadOnly s_defaultDecimalPlaces As Byte = 3
+    Private Shared s_defaultDecimalPlaces As Byte = 3
 
     Private Sub New(value As Long)
         _size = CULng(value)
@@ -36,6 +36,7 @@ Public Structure MemorySize
             If value > s_decimalPlacecFormatStrings.Length Then
                 Throw New ArgumentException($"Formatting is limitted to {s_decimalPlacecFormatStrings.Length} decimal places.")
             End If
+            s_defaultDecimalPlaces = value
         End Set
     End Property
 
@@ -46,12 +47,14 @@ Public Structure MemorySize
     End Property
 
     Public Overrides Function ToString() As String
-        Dim previousSize As ULong
+        Dim floatSize As Double = _size
+        Dim previousSize As Double
 
         For i = 1 To s_units.Length
-            previousSize = _size
-            If _size >> 8 = 0 Then
-                Return $"{previousSize:s_decimalPlacecFormatStrings} {s_units(i - 1)}"
+            previousSize = floatSize
+            floatSize /= 1024
+            If floatSize < 1 Then
+                Return $"{previousSize.ToString(s_decimalPlacecFormatStrings(s_defaultDecimalPlaces))} {s_units(i - 1)}"
             End If
         Next
 

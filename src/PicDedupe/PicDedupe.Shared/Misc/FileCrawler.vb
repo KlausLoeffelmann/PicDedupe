@@ -31,7 +31,7 @@ Public Class FileCrawler
         Return _startPath.GetDirectories()
     End Function
 
-    Public Function GetFilesRecursively() As DirectoryInfoTree
+    Public Function GetFiles() As DirectoryInfoTree
 
         Dim searchAction As Action
         Dim directoryInfoTree = New DirectoryInfoTree(_startPath)
@@ -57,29 +57,39 @@ Public Class FileCrawler
         Dim fileCount As Integer = 0
 
         Dim ioDirectories = _startPath.EnumerateDirectories(AllFilesSearchPattern, SearchOption.AllDirectories)
-        For Each directoryItem In ioDirectories
-            currentNode = directoryInfoTree.AddDirectory(directoryItem)
+        Dim ioDirectoriesEnumerator = New ExceptionHandlingEnumerator(Of DirectoryInfo)(ioDirectories)
+        Try
 
-            If Not topLevelDirectoriesAvailableFired Then
-                If directoryItem.Parent.FullName <> _startPath.FullName Then
-                    RaiseEvent TopLevelDirectoriesAvailable(Me, New TopLevelDirectoriesAvailableEventArgs(topLevelDirectories))
-                    topLevelDirectoriesAvailableFired = True
-                Else
-                    topLevelDirectories.Add(currentNode)
+            For Each directoryItem In ioDirectoriesEnumerator
+                If directoryItem Is Nothing Then
+                    If ioDirectoriesEnumerator.LastException IsNot Nothing Then
+                        Continue For
+                    End If
                 End If
-            End If
+                currentNode = directoryInfoTree.AddDirectory(directoryItem)
 
-            Dim files = directoryItem.EnumerateFiles(AllFilesSearchPattern)
-            For Each currentFileItem In files
-                searchAction()
-                fileCount += 1
-                If fileCount = 50 Then
-                    fileCount = 0
-                    RaiseEvent ProgressUpdate(Me, New ProgressUpdateEventArgs(currentNode))
+                If Not topLevelDirectoriesAvailableFired Then
+                    If directoryItem.Parent.FullName <> _startPath.FullName Then
+                        RaiseEvent TopLevelDirectoriesAvailable(Me, New TopLevelDirectoriesAvailableEventArgs(topLevelDirectories))
+                        topLevelDirectoriesAvailableFired = True
+                    Else
+                        topLevelDirectories.Add(currentNode)
+                    End If
                 End If
+
+                Dim files = directoryItem.EnumerateFiles(AllFilesSearchPattern)
+                For Each currentFileItem In files
+                    searchAction()
+                    fileCount += 1
+                    If fileCount = 50 Then
+                        fileCount = 0
+                        RaiseEvent ProgressUpdate(Me, New ProgressUpdateEventArgs(currentNode))
+                    End If
+                Next
             Next
-        Next
+        Catch ex As Exception
 
+        End Try
         Return directoryInfoTree
     End Function
 End Class

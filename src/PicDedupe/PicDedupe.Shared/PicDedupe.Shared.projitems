@@ -9,6 +9,7 @@
     <Import_RootNamespace>PicDedupe.Shared</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)ExceptionHandlingEnumerator.vb" />
     <Compile Include="$(MSBuildThisFileDirectory)Misc\DirectoryInfoTree.vb" />
     <Compile Include="$(MSBuildThisFileDirectory)Misc\FileCrawler.vb" />
     <Compile Include="..\PicDedupe.Shared\Controls\FolderListView.vb" />

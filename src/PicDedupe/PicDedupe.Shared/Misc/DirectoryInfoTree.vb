@@ -118,17 +118,6 @@ Public Class DirectoryInfoNode
         ParentNode?.UpdateSize(size)
     End Sub
 
-    Friend Function GetFolderListViewItems() As IEnumerable(Of FolderListViewItem)
-
-        Dim listViewItems = New List(Of FolderListViewItem)
-
-        For Each nodeItem In Nodes
-            listViewItems.Add(New FolderListViewItem(nodeItem, nodeItem.FileCount, nodeItem.FileSize))
-        Next
-
-        Return listViewItems
-    End Function
-
     Public Function TryGetNode(directoryName As String, ByRef node As DirectoryInfoNode) As Boolean
         Return _directories.TryGetValue(directoryName, node)
     End Function
