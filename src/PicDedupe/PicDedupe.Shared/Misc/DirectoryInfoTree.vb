@@ -3,7 +3,7 @@
 Public Class DirectoryInfoTree
 
     Private _lastNodeAdded As DirectoryInfoNode
-    Private ReadOnly _nodeDirectorynameQueue As New Queue(Of String)
+    Private ReadOnly _nodeDirectorynameStack As New Stack(Of String)
 
     Public Sub New(rootDirectory As DirectoryInfo)
         RootNode = DirectoryInfoNode.CreateRootNode(rootDirectory)
@@ -13,20 +13,20 @@ Public Class DirectoryInfoTree
 
         If _lastNodeAdded Is Nothing Then
             If RootNode.Directory.FullName = directory.Parent.FullName Then
-                _lastNodeAdded = RootNode.AddDirectory(directory)
+                _lastNodeAdded = RootNode.AddDirectory(directory, Nothing)
                 Return _lastNodeAdded
             End If
         End If
 
         If _lastNodeAdded.ParentNode.Directory.FullName = directory.Parent.FullName Then
-            _lastNodeAdded = _lastNodeAdded.ParentNode.AddDirectory(directory)
+            _lastNodeAdded = _lastNodeAdded.ParentNode.AddDirectory(directory, _lastNodeAdded.TopLevelNode)
             Return _lastNodeAdded
         Else
             ' Find Root and store the Nodes up the Hirachy on the way
             Dim currentDirectory = directory
             Do While currentDirectory.Parent IsNot Nothing AndAlso currentDirectory.FullName <> RootNode.Directory.FullName
                 currentDirectory = currentDirectory.Parent
-                _nodeDirectorynameQueue.Enqueue(currentDirectory.Name)
+                _nodeDirectorynameStack.Push(currentDirectory.Name)
             Loop
 
             If currentDirectory.Parent Is Nothing Then
@@ -35,18 +35,22 @@ Public Class DirectoryInfoTree
 
             Dim currentNode = RootNode
             Dim newCurrentNode As DirectoryInfoNode = Nothing
+            Dim topLevelNode As DirectoryInfoNode = Nothing
 
             Dim pathPart As String
-            Do While _nodeDirectorynameQueue.Count > 0
-                pathPart = _nodeDirectorynameQueue.Dequeue
+            Do While _nodeDirectorynameStack.Count > 0
+                pathPart = _nodeDirectorynameStack.Pop
                 If currentNode.TryGetNode(pathPart, newCurrentNode) Then
                     currentNode = newCurrentNode
+                    If topLevelNode Is Nothing Then
+                        topLevelNode = currentNode
+                    End If
                 Else
-                    Return currentNode.AddDirectory(directory)
+                    Throw New ArgumentException($"Directory does not match the root path: {directory.FullName}")
                 End If
             Loop
 
-            Throw New ArgumentException($"Directory does not match the root path: {directory.FullName}")
+            Return currentNode.AddDirectory(directory, topLevelNode)
         End If
     End Function
 
@@ -58,7 +62,10 @@ Public Class DirectoryInfoNode
     Private ReadOnly _files As New Dictionary(Of String, FileInfo)
     Private ReadOnly _nodes As New List(Of DirectoryInfoNode)
     Private ReadOnly _directory As DirectoryInfo
+    Private _fileCount As Integer
+    Private _fileSize As ULong
     Private _parentNode As DirectoryInfoNode
+    Private _topLevelNode As DirectoryInfoNode
 
     Private Sub New(directory As DirectoryInfo)
         _directory = directory
@@ -69,7 +76,7 @@ Public Class DirectoryInfoNode
         Return New DirectoryInfoNode(directory)
     End Function
 
-    Public Function AddDirectory(directory As DirectoryInfo) As DirectoryInfoNode
+    Public Function AddDirectory(directory As DirectoryInfo, toplevelNode As DirectoryInfoNode) As DirectoryInfoNode
         If directory Is Nothing Then
             Throw New ArgumentNullException(NameOf(directory))
         End If
@@ -81,6 +88,7 @@ Public Class DirectoryInfoNode
         Dim node = New DirectoryInfoNode(directory) With {
             ._parentNode = Me
         }
+        node.TopLevelNode = toplevelNode
         _nodes.Add(node)
         _directories.Add(directory.Name, node)
         Return node
@@ -96,7 +104,46 @@ Public Class DirectoryInfoNode
         End If
 
         _files.Add(file.Name, file)
+        UpdateCount()
+        UpdateSize(CULng(file.Length))
     End Sub
+
+    Private Sub UpdateCount()
+        _fileCount += 1
+        ParentNode?.UpdateCount()
+    End Sub
+
+    Private Sub UpdateSize(size As ULong)
+        _fileSize += size
+        ParentNode?.UpdateSize(size)
+    End Sub
+
+    Friend Function GetFolderListViewItems() As IEnumerable(Of FolderListViewItem)
+
+        Dim listViewItems = New List(Of FolderListViewItem)
+
+        For Each nodeItem In Nodes
+            listViewItems.Add(New FolderListViewItem(nodeItem, nodeItem.FileCount, nodeItem.FileSize))
+        Next
+
+        Return listViewItems
+    End Function
+
+    Public Function TryGetNode(directoryName As String, ByRef node As DirectoryInfoNode) As Boolean
+        Return _directories.TryGetValue(directoryName, node)
+    End Function
+
+    Public ReadOnly Property FileCount As Integer
+        Get
+            Return _fileCount
+        End Get
+    End Property
+
+    Public ReadOnly Property FileSize As MemorySize
+        Get
+            Return _fileSize
+        End Get
+    End Property
 
     Public ReadOnly Property Directory As DirectoryInfo
         Get
@@ -110,10 +157,6 @@ Public Class DirectoryInfoNode
         End Get
     End Property
 
-    Public Function TryGetNode(directoryName As String, ByRef node As DirectoryInfoNode) As Boolean
-        Return _directories.TryGetValue(directoryName, node)
-    End Function
-
     Public ReadOnly Property Files As IReadOnlyList(Of FileInfo)
         Get
             Return _files.Values.ToList()
@@ -125,4 +168,14 @@ Public Class DirectoryInfoNode
             Return _nodes
         End Get
     End Property
+
+    Public Property TopLevelNode As DirectoryInfoNode
+        Get
+            Return _topLevelNode
+        End Get
+        Private Set(value As DirectoryInfoNode)
+            _topLevelNode = value
+        End Set
+    End Property
+
 End Class

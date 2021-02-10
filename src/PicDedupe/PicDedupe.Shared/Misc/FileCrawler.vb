@@ -2,6 +2,9 @@
 
 Public Class FileCrawler
 
+    Public Event TopLevelDirectoriesAvailable(sender As Object, e As TopLevelDirectoriesAvailableEventArgs)
+    Public Event ProgressUpdate(sender As Object, e As ProgressUpdateEventArgs)
+
     Private Const AllFilesSearchPattern = "*.*"
 
     Private ReadOnly _startPath As DirectoryInfo
@@ -28,7 +31,7 @@ Public Class FileCrawler
         Return _startPath.GetDirectories()
     End Function
 
-    Public Function GetFilesRecursively() As FileInfo()
+    Public Function GetFilesRecursively() As DirectoryInfoTree
 
         Dim searchAction As Action
         Dim directoryInfoTree = New DirectoryInfoTree(_startPath)
@@ -49,14 +52,35 @@ Public Class FileCrawler
                 End Sub
         End If
 
+        Dim topLevelDirectories = New List(Of DirectoryInfoNode)
+        Dim topLevelDirectoriesAvailableFired = False
+        Dim fileCount As Integer = 0
+
         Dim ioDirectories = _startPath.EnumerateDirectories(AllFilesSearchPattern, SearchOption.AllDirectories)
         For Each directoryItem In ioDirectories
             currentNode = directoryInfoTree.AddDirectory(directoryItem)
+
+            If Not topLevelDirectoriesAvailableFired Then
+                If directoryItem.Parent.FullName <> _startPath.FullName Then
+                    RaiseEvent TopLevelDirectoriesAvailable(Me, New TopLevelDirectoriesAvailableEventArgs(topLevelDirectories))
+                    topLevelDirectoriesAvailableFired = True
+                Else
+                    topLevelDirectories.Add(currentNode)
+                End If
+            End If
+
             Dim files = directoryItem.EnumerateFiles(AllFilesSearchPattern)
             For Each currentFileItem In files
                 searchAction()
+                fileCount += 1
+                If fileCount = 50 Then
+                    fileCount = 0
+                    RaiseEvent ProgressUpdate(Me, New ProgressUpdateEventArgs(currentNode))
+                End If
             Next
         Next
+
+        Return directoryInfoTree
     End Function
 End Class
 
@@ -65,3 +89,24 @@ Public Structure ProgressReportInfo
     Public Size As MemorySize
     Public Count As Integer
 End Structure
+
+Public Class TopLevelDirectoriesAvailableEventArgs
+    Inherits EventArgs
+
+    Public Sub New(topLevelDirectories As IEnumerable(Of DirectoryInfoNode))
+        Me.TopLevelDirectories = topLevelDirectories
+    End Sub
+
+    Public ReadOnly Property TopLevelDirectories As IEnumerable(Of DirectoryInfoNode)
+End Class
+
+Public Class ProgressUpdateEventArgs
+    Inherits EventArgs
+
+    Public Sub New(nodeToUpdate As DirectoryInfoNode)
+        Me.NodeToUpdate = nodeToUpdate
+    End Sub
+
+    Public ReadOnly Property NodeToUpdate As DirectoryInfoNode
+
+End Class
