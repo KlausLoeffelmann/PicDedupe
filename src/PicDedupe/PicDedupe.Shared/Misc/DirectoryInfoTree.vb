@@ -29,7 +29,11 @@ Public Class DirectoryInfoTree
                 _nodeDirectorynameStack.Push(currentDirectory.Name)
             Loop
 
-            If currentDirectory.Parent Is Nothing Then
+            ' We don't need to look for the root name in the root name,
+            ' we start the search one level below.
+            _nodeDirectorynameStack.Pop()
+
+            If currentDirectory.FullName <> RootNode.Directory.FullName AndAlso currentDirectory.Parent Is Nothing Then
                 Throw New ArgumentException($"Directory does not match the root path: {directory.FullName}")
             End If
 
@@ -69,7 +73,6 @@ Public Class DirectoryInfoNode
 
     Private Sub New(directory As DirectoryInfo)
         _directory = directory
-        _directories.Add(directory.Name, Me)
     End Sub
 
     Public Shared Function CreateRootNode(directory As DirectoryInfo) As DirectoryInfoNode
@@ -90,7 +93,11 @@ Public Class DirectoryInfoNode
         }
         node.TopLevelNode = toplevelNode
         _nodes.Add(node)
-        _directories.Add(directory.Name, node)
+        Try
+            _directories.Add(directory.Name, node)
+        Catch ex As Exception
+
+        End Try
         Return node
     End Function
 

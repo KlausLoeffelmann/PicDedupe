@@ -34,10 +34,14 @@ Public Class FileCrawler
 
     Public Function GetFiles() As DirectoryInfoTree
 
+        Const EventRaiserCounterThreshold As Integer = 2000
+
         Dim searchAction As Action
+        Dim eventRaiser As Action(Of DirectoryInfoNode)
         Dim directoryInfoTree = New DirectoryInfoTree(_startPath)
         Dim currentNode = directoryInfoTree.RootNode
         Dim currentFileItem As FileInfo = Nothing
+        Dim eventRaiseCounter As Integer
 
         If _searchPattern.Any(Function(searchPattern) searchPattern = ".*") Then
             searchAction =
@@ -53,11 +57,20 @@ Public Class FileCrawler
                 End Sub
         End If
 
+        eventRaiser =
+            Sub(nodeToUpdate)
+                eventRaiseCounter += 1
+                If eventRaiseCounter = EventRaiserCounterThreshold Then
+                    eventRaiseCounter = 0
+                    RaiseEvent ProgressUpdate(Me, ProgressUpdateEventArgs.GetDefault(nodeToUpdate))
+                End If
+            End Sub
+
         Dim topLevelDirectories = New List(Of DirectoryInfoNode)
         Dim topLevelDirectoriesAvailableFired = False
         Dim fileCount As Integer = 0
 
-        Dim ioDirectories = _startPath.EnumerateAllSubDirectories()
+        Dim ioDirectories = _startPath.EnumerateAllSubDirectories(FileAttributes.Hidden Or FileAttributes.System)
 
         For Each directoryItem In ioDirectories
 
@@ -78,16 +91,17 @@ Public Class FileCrawler
                 files = directoryItem.EnumerateFiles(AllFilesSearchPattern)
                 For Each currentFileItem In files
                     searchAction()
-                    fileCount += 1
-                    If fileCount = 50 Then
-                        fileCount = 0
-                        RaiseEvent ProgressUpdate(Me, New ProgressUpdateEventArgs(currentNode))
-                    End If
+                    eventRaiser(currentNode)
                 Next
+                eventRaiser(currentNode)
             Catch ex As Exception
                 ' We swallow this, if EnumerateFiles causes an exception.
             End Try
         Next
+
+        ' We update now unconditionally.
+        eventRaiseCounter = EventRaiserCounterThreshold
+        eventRaiser(currentNode)
 
         Return directoryInfoTree
     End Function
@@ -97,7 +111,7 @@ End Class
 Public Module FileInfoExtension
 
     <Extension>
-    Public Function EnumerateAllSubDirectories(directory As DirectoryInfo) As IEnumerable(Of DirectoryInfo)
+    Public Function EnumerateAllSubDirectories(directory As DirectoryInfo, Optional excludeAttributes As FileAttributes = Nothing) As IEnumerable(Of DirectoryInfo)
 
         Dim queue As EnumerableQueue(Of DirectoryInfo) = Nothing
 
@@ -109,7 +123,10 @@ Public Module FileInfoExtension
                 Dim newDirectories As IEnumerable(Of DirectoryInfo) = Nothing
 
                 Try
-                    newDirectories = item.EnumerateDirectories()
+                    newDirectories = item.
+                        EnumerateDirectories().
+                        Where(Function(dirItem) Not dirItem.Attributes.HasFlag(excludeAttributes))
+
                 Catch ex As Exception
                     'We swallow those.
                 End Try

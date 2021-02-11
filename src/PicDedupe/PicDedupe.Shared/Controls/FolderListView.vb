@@ -41,6 +41,11 @@ Public Class FolderListViewItem
         _node = node
     End Sub
 
+    Public Sub UpdateItem()
+        SubItems(1).Text = s_fileCountFormatter(Node.FileCount)
+        SubItems(2).Text = $"{Node.FileSize}"
+    End Sub
+
     Public ReadOnly Property Node As DirectoryInfoNode
         Get
             Return _node

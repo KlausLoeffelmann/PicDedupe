@@ -25,9 +25,14 @@ Partial Class FormMain
         Me.fileCrawlerPathPicker = New PicDedupe.Net.PathPicker()
         Me.folderSplitter = New System.Windows.Forms.SplitContainer()
         Me.fileCrawlerFolderListView = New PicDedupe.Net.FolderListView()
+        Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
+        Me.TotalFileSize = New System.Windows.Forms.ToolStripStatusLabel()
+        Me.TotalFileCount = New System.Windows.Forms.ToolStripStatusLabel()
+        Me.EllapsedTime = New System.Windows.Forms.ToolStripStatusLabel()
         CType(Me.folderSplitter, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.folderSplitter.Panel1.SuspendLayout()
         Me.folderSplitter.SuspendLayout()
+        Me.StatusStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
         'fileCrawlerPathPicker
@@ -41,6 +46,9 @@ Partial Class FormMain
         '
         'folderSplitter
         '
+        Me.folderSplitter.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.folderSplitter.Location = New System.Drawing.Point(5, 73)
         Me.folderSplitter.Name = "folderSplitter"
         Me.folderSplitter.Orientation = System.Windows.Forms.Orientation.Horizontal
@@ -48,26 +56,58 @@ Partial Class FormMain
         'folderSplitter.Panel1
         '
         Me.folderSplitter.Panel1.Controls.Add(Me.fileCrawlerFolderListView)
-        Me.folderSplitter.Size = New System.Drawing.Size(1044, 551)
-        Me.folderSplitter.SplitterDistance = 348
+        Me.folderSplitter.Size = New System.Drawing.Size(1044, 523)
+        Me.folderSplitter.SplitterDistance = 330
         Me.folderSplitter.TabIndex = 2
         '
         'fileCrawlerFolderListView
         '
+        Me.fileCrawlerFolderListView.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.fileCrawlerFolderListView.FullRowSelect = True
         Me.fileCrawlerFolderListView.HideSelection = False
         Me.fileCrawlerFolderListView.Location = New System.Drawing.Point(7, 17)
         Me.fileCrawlerFolderListView.Name = "fileCrawlerFolderListView"
-        Me.fileCrawlerFolderListView.Size = New System.Drawing.Size(1034, 307)
+        Me.fileCrawlerFolderListView.Size = New System.Drawing.Size(1034, 310)
         Me.fileCrawlerFolderListView.TabIndex = 0
         Me.fileCrawlerFolderListView.UseCompatibleStateImageBehavior = False
         Me.fileCrawlerFolderListView.View = System.Windows.Forms.View.Details
+        '
+        'StatusStrip1
+        '
+        Me.StatusStrip1.ImageScalingSize = New System.Drawing.Size(20, 20)
+        Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.TotalFileSize, Me.TotalFileCount, Me.EllapsedTime})
+        Me.StatusStrip1.Location = New System.Drawing.Point(0, 624)
+        Me.StatusStrip1.Name = "StatusStrip1"
+        Me.StatusStrip1.Size = New System.Drawing.Size(1062, 26)
+        Me.StatusStrip1.TabIndex = 3
+        Me.StatusStrip1.Text = "StatusStrip1"
+        '
+        'TotalFileSize
+        '
+        Me.TotalFileSize.Name = "TotalFileSize"
+        Me.TotalFileSize.Size = New System.Drawing.Size(129, 20)
+        Me.TotalFileSize.Text = "Total file size: - - -"
+        '
+        'TotalFileCount
+        '
+        Me.TotalFileCount.Name = "TotalFileCount"
+        Me.TotalFileCount.Size = New System.Drawing.Size(141, 20)
+        Me.TotalFileCount.Text = "Total file count: - - -"
+        '
+        'EllapsedTime
+        '
+        Me.EllapsedTime.Name = "EllapsedTime"
+        Me.EllapsedTime.Size = New System.Drawing.Size(184, 20)
+        Me.EllapsedTime.Text = "Ellapsed Time: not started."
         '
         'FormMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1062, 650)
+        Me.Controls.Add(Me.StatusStrip1)
         Me.Controls.Add(Me.folderSplitter)
         Me.Controls.Add(Me.fileCrawlerPathPicker)
         Me.Name = "FormMain"
@@ -75,11 +115,18 @@ Partial Class FormMain
         Me.folderSplitter.Panel1.ResumeLayout(False)
         CType(Me.folderSplitter, System.ComponentModel.ISupportInitialize).EndInit()
         Me.folderSplitter.ResumeLayout(False)
+        Me.StatusStrip1.ResumeLayout(False)
+        Me.StatusStrip1.PerformLayout()
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
 
     Friend WithEvents fileCrawlerPathPicker As PathPicker
     Friend WithEvents folderSplitter As SplitContainer
     Friend WithEvents fileCrawlerFolderListView As FolderListView
+    Friend WithEvents StatusStrip1 As StatusStrip
+    Friend WithEvents TotalFileSize As ToolStripStatusLabel
+    Friend WithEvents TotalFileCount As ToolStripStatusLabel
+    Friend WithEvents EllapsedTime As ToolStripStatusLabel
 End Class
