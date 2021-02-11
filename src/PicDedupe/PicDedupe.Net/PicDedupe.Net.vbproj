@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net5.0-windows</TargetFramework>
     <RootNamespace>PicDedupe.Net</RootNamespace>
     <StartupObject>Sub Main</StartupObject>
     <UseWindowsForms>true</UseWindowsForms>
@@ -35,18 +35,6 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Update="PathPicker.Designer.vb">
-      <DependentUpon>PathPicker.vb</DependentUpon>
-    </Compile>
-    <Compile Update="PathPicker.vb">
-      <SubType>UserControl</SubType>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Update="PathPicker.resx">
-      <DependentUpon>PathPicker.vb</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>

@@ -2,7 +2,7 @@
 
     Private WithEvents _fileCrawler As FileCrawler
 
-    Private Async Sub PathPicker1_PathChanged(sender As Object, e As PathChangedEventArgs) Handles PathPicker1.PathChanged
+    Private Async Sub fileCrawlerPathPicker_PathChanged(sender As Object, e As PathChangedEventArgs) Handles fileCrawlerPathPicker.PathChanged
         Await UpdatePathView(e.Path)
     End Sub
 
@@ -13,7 +13,7 @@
     Private Sub _fileCrawler_TopLevelDirectoriesAvailable(sender As Object, e As TopLevelDirectoriesAvailableEventArgs) Handles _fileCrawler.TopLevelDirectoriesAvailable
         Invoke(Sub()
                    For Each item In e.TopLevelDirectories
-                       Me.FolderListView1.Items.Add(New FolderListViewItem(item))
+                       Me.fileCrawlerFolderListView.Items.Add(New FolderListViewItem(item))
                    Next
                End Sub)
     End Sub

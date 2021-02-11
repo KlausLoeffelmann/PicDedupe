@@ -43,14 +43,14 @@ Partial Class PathPicker
         Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
         Me.TableLayoutPanel1.RowCount = 1
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-        Me.TableLayoutPanel1.Size = New System.Drawing.Size(594, 42)
+        Me.TableLayoutPanel1.Size = New System.Drawing.Size(594, 36)
         Me.TableLayoutPanel1.TabIndex = 0
         '
         'lblCaption
         '
         Me.lblCaption.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.lblCaption.AutoSize = True
-        Me.lblCaption.Location = New System.Drawing.Point(3, 11)
+        Me.lblCaption.Location = New System.Drawing.Point(3, 8)
         Me.lblCaption.Name = "lblCaption"
         Me.lblCaption.Size = New System.Drawing.Size(40, 20)
         Me.lblCaption.TabIndex = 0
@@ -59,7 +59,7 @@ Partial Class PathPicker
         'txtPath
         '
         Me.txtPath.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtPath.Location = New System.Drawing.Point(49, 7)
+        Me.txtPath.Location = New System.Drawing.Point(49, 4)
         Me.txtPath.Name = "txtPath"
         Me.txtPath.Size = New System.Drawing.Size(508, 27)
         Me.txtPath.TabIndex = 1
@@ -67,7 +67,7 @@ Partial Class PathPicker
         'btnShowDialog
         '
         Me.btnShowDialog.Anchor = System.Windows.Forms.AnchorStyles.None
-        Me.btnShowDialog.Location = New System.Drawing.Point(563, 7)
+        Me.btnShowDialog.Location = New System.Drawing.Point(563, 4)
         Me.btnShowDialog.Name = "btnShowDialog"
         Me.btnShowDialog.Size = New System.Drawing.Size(28, 27)
         Me.btnShowDialog.TabIndex = 2
@@ -80,7 +80,7 @@ Partial Class PathPicker
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.Controls.Add(Me.TableLayoutPanel1)
         Me.Name = "PathPicker"
-        Me.Size = New System.Drawing.Size(594, 42)
+        Me.Size = New System.Drawing.Size(594, 36)
         Me.TableLayoutPanel1.ResumeLayout(False)
         Me.TableLayoutPanel1.PerformLayout()
         Me.ResumeLayout(False)

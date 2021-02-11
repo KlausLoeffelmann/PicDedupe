@@ -1,4 +1,5 @@
 ﻿Imports System.IO
+Imports System.Runtime.CompilerServices
 
 Public Class FileCrawler
 
@@ -56,28 +57,25 @@ Public Class FileCrawler
         Dim topLevelDirectoriesAvailableFired = False
         Dim fileCount As Integer = 0
 
-        Dim ioDirectories = _startPath.EnumerateDirectories(AllFilesSearchPattern, SearchOption.AllDirectories)
-        Dim ioDirectoriesEnumerator = New ExceptionHandlingEnumerator(Of DirectoryInfo)(ioDirectories)
-        Try
+        Dim ioDirectories = _startPath.EnumerateAllSubDirectories()
 
-            For Each directoryItem In ioDirectoriesEnumerator
-                If directoryItem Is Nothing Then
-                    If ioDirectoriesEnumerator.LastException IsNot Nothing Then
-                        Continue For
-                    End If
+        For Each directoryItem In ioDirectories
+
+            currentNode = directoryInfoTree.AddDirectory(directoryItem)
+
+            If Not topLevelDirectoriesAvailableFired Then
+                If directoryItem.Parent.FullName <> _startPath.FullName Then
+                    RaiseEvent TopLevelDirectoriesAvailable(Me, New TopLevelDirectoriesAvailableEventArgs(topLevelDirectories))
+                    topLevelDirectoriesAvailableFired = True
+                Else
+                    topLevelDirectories.Add(currentNode)
                 End If
-                currentNode = directoryInfoTree.AddDirectory(directoryItem)
+            End If
 
-                If Not topLevelDirectoriesAvailableFired Then
-                    If directoryItem.Parent.FullName <> _startPath.FullName Then
-                        RaiseEvent TopLevelDirectoriesAvailable(Me, New TopLevelDirectoriesAvailableEventArgs(topLevelDirectories))
-                        topLevelDirectoriesAvailableFired = True
-                    Else
-                        topLevelDirectories.Add(currentNode)
-                    End If
-                End If
+            Dim files As IEnumerable(Of FileInfo) = Nothing
 
-                Dim files = directoryItem.EnumerateFiles(AllFilesSearchPattern)
+            Try
+                files = directoryItem.EnumerateFiles(AllFilesSearchPattern)
                 For Each currentFileItem In files
                     searchAction()
                     fileCount += 1
@@ -86,37 +84,48 @@ Public Class FileCrawler
                         RaiseEvent ProgressUpdate(Me, New ProgressUpdateEventArgs(currentNode))
                     End If
                 Next
-            Next
-        Catch ex As Exception
+            Catch ex As Exception
+                ' We swallow this, if EnumerateFiles causes an exception.
+            End Try
+        Next
 
-        End Try
         Return directoryInfoTree
     End Function
-End Class
-
-Public Structure ProgressReportInfo
-    Public Directory As DirectoryInfo
-    Public Size As MemorySize
-    Public Count As Integer
-End Structure
-
-Public Class TopLevelDirectoriesAvailableEventArgs
-    Inherits EventArgs
-
-    Public Sub New(topLevelDirectories As IEnumerable(Of DirectoryInfoNode))
-        Me.TopLevelDirectories = topLevelDirectories
-    End Sub
-
-    Public ReadOnly Property TopLevelDirectories As IEnumerable(Of DirectoryInfoNode)
-End Class
-
-Public Class ProgressUpdateEventArgs
-    Inherits EventArgs
-
-    Public Sub New(nodeToUpdate As DirectoryInfoNode)
-        Me.NodeToUpdate = nodeToUpdate
-    End Sub
-
-    Public ReadOnly Property NodeToUpdate As DirectoryInfoNode
 
 End Class
+
+Public Module FileInfoExtension
+
+    <Extension>
+    Public Function EnumerateAllSubDirectories(directory As DirectoryInfo) As IEnumerable(Of DirectoryInfo)
+
+        Dim queue As EnumerableQueue(Of DirectoryInfo) = Nothing
+
+        ' This is the delegate which gets called on dequeueing each item.
+        ' It practically fills up the queue with the SubItems from that item.
+        ' (If there are any).
+        Dim getSubFolder = New Action(Of DirectoryInfo)(
+            Sub(item)
+                Dim newDirectories As IEnumerable(Of DirectoryInfo) = Nothing
+
+                Try
+                    newDirectories = item.EnumerateDirectories()
+                Catch ex As Exception
+                    'We swallow those.
+                End Try
+
+                If newDirectories?.FirstOrDefault IsNot Nothing Then
+                    queue.Queue(newDirectories)
+                End If
+            End Sub)
+
+        queue = New EnumerableQueue(Of DirectoryInfo)(getSubFolder)
+
+        ' We use that delegate here, too, to kick the operation off.
+        ' We start the queue with the direct subfolders of the directory
+        ' we got passed as the start path.
+        getSubFolder(directory)
+
+        Return queue.ToIEnumerable
+    End Function
+End Module
