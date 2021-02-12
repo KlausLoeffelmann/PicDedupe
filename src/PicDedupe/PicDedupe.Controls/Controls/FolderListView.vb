@@ -15,9 +15,9 @@ Public Class FolderListView
 
     Private Sub SetupHeader()
         Me.Columns.Clear()
-        Me.Columns.Add("Foldername", 300, HorizontalAlignment.Left)
-        Me.Columns.Add("Files", 150, HorizontalAlignment.Right)
-        Me.Columns.Add("Size", 300, HorizontalAlignment.Right)
+        Me.Columns.Add("Foldername", 200, HorizontalAlignment.Left)
+        Me.Columns.Add("Files", 100, HorizontalAlignment.Right)
+        Me.Columns.Add("Size", 200, HorizontalAlignment.Right)
     End Sub
 
 End Class

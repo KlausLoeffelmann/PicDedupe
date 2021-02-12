@@ -5,9 +5,28 @@ Public Class FormMain
 
     Private WithEvents _fileCrawler As FileCrawler
     Private _stopWatch As Stopwatch
+    Private WithEvents _timer As Timer
+
+    Sub New()
+
+        ' This call is required by the designer.
+        InitializeComponent()
+
+        ' Add any initialization after the InitializeComponent() call.
+        _timer = New Timer() With
+        {
+            .Interval = 1000,
+            .Enabled = True
+        }
+
+    End Sub
 
     Private Async Sub fileCrawlerPathPicker_PathChanged(sender As Object, e As PathChangedEventArgs) Handles fileCrawlerPathPicker.PathChanged
         Await UpdatePathView(e.Path)
+    End Sub
+
+    Private Sub _timer_Tick(sender As Object, e As EventArgs) Handles _timer.Tick
+        CurrentTime.Text = Date.Now.ToShortTimeString
     End Sub
 
     Private Sub FileCrawler_ProgressUpdate(sender As Object, e As ProgressUpdateEventArgs)

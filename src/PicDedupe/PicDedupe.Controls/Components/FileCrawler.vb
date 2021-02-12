@@ -38,7 +38,7 @@ Public Class FileCrawler
 
     Public Function GetFiles() As DirectoryInfoTree
 
-        Const EventRaiserCounterThreshold As Integer = 500
+        Const EventRaiserCounterThreshold As Integer = 1000
 
         Dim searchAction As Action
         Dim eventRaiser As Action(Of DirectoryInfoNode)

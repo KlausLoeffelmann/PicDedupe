@@ -40,47 +40,52 @@ Partial Class PathPicker
         Me.TableLayoutPanel1.Controls.Add(Me.btnShowDialog, 2, 0)
         Me.TableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TableLayoutPanel1.Location = New System.Drawing.Point(0, 0)
+        Me.TableLayoutPanel1.Margin = New System.Windows.Forms.Padding(2)
         Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
         Me.TableLayoutPanel1.RowCount = 1
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-        Me.TableLayoutPanel1.Size = New System.Drawing.Size(594, 36)
+        Me.TableLayoutPanel1.Size = New System.Drawing.Size(446, 23)
         Me.TableLayoutPanel1.TabIndex = 0
         '
         'lblCaption
         '
         Me.lblCaption.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.lblCaption.AutoSize = True
-        Me.lblCaption.Location = New System.Drawing.Point(3, 8)
+        Me.lblCaption.Location = New System.Drawing.Point(2, 5)
+        Me.lblCaption.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.lblCaption.Name = "lblCaption"
-        Me.lblCaption.Size = New System.Drawing.Size(40, 20)
+        Me.lblCaption.Size = New System.Drawing.Size(32, 13)
         Me.lblCaption.TabIndex = 0
         Me.lblCaption.Text = "Path:"
         '
         'txtPath
         '
         Me.txtPath.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtPath.Location = New System.Drawing.Point(49, 4)
+        Me.txtPath.Location = New System.Drawing.Point(38, 2)
+        Me.txtPath.Margin = New System.Windows.Forms.Padding(2)
         Me.txtPath.Name = "txtPath"
-        Me.txtPath.Size = New System.Drawing.Size(508, 27)
+        Me.txtPath.Size = New System.Drawing.Size(381, 20)
         Me.txtPath.TabIndex = 1
         '
         'btnShowDialog
         '
         Me.btnShowDialog.Anchor = System.Windows.Forms.AnchorStyles.None
-        Me.btnShowDialog.Location = New System.Drawing.Point(563, 4)
+        Me.btnShowDialog.Location = New System.Drawing.Point(423, 2)
+        Me.btnShowDialog.Margin = New System.Windows.Forms.Padding(2)
         Me.btnShowDialog.Name = "btnShowDialog"
-        Me.btnShowDialog.Size = New System.Drawing.Size(28, 27)
+        Me.btnShowDialog.Size = New System.Drawing.Size(21, 19)
         Me.btnShowDialog.TabIndex = 2
         Me.btnShowDialog.Text = "..."
         Me.btnShowDialog.UseVisualStyleBackColor = True
         '
         'PathPicker
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 20.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.Controls.Add(Me.TableLayoutPanel1)
+        Me.Margin = New System.Windows.Forms.Padding(2)
         Me.Name = "PathPicker"
-        Me.Size = New System.Drawing.Size(594, 36)
+        Me.Size = New System.Drawing.Size(446, 23)
         Me.TableLayoutPanel1.ResumeLayout(False)
         Me.TableLayoutPanel1.PerformLayout()
         Me.ResumeLayout(False)
