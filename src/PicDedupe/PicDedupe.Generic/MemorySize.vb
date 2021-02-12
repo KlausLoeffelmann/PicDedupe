@@ -4,8 +4,11 @@ Public Structure MemorySize
 
     Private _size As ULong ' An ULong can represent a maximum of 16 Exabytes.
 
-    Private Shared ReadOnly s_units As String() =
+    Private Shared ReadOnly s_units_longnames As String() =
         {"Bytes", "Kilobytes", "MegaBytes", "Gigabytes", "Terabytes", "Petabytes", "Exabytes"}
+
+    Private Shared ReadOnly s_units As String() =
+        {"Bytes", "KBytes", "MBytes", "GBytes", "TBytes", "PBytes", "EBytes"}
 
     Private Shared ReadOnly s_decimalPlacecFormatStrings As String() =
         {"#,##0", "#,##0.0", "#,##0.00", "#,##0.000", "#,##0.0000", "#,##0.00000"}

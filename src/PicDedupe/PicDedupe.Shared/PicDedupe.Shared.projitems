@@ -19,16 +19,14 @@
     <Compile Include="$(MSBuildThisFileDirectory)Controls\ProgressReportInfo.vb" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\ProgressUpdateEventArgs.vb" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\TopLevelDirectoriesAvailableEventArgs.vb" />
-    <Compile Include="$(MSBuildThisFileDirectory)ExceptionHandlingEnumerator.vb" />
-    <Compile Include="$(MSBuildThisFileDirectory)Misc\DirectoryInfoTree.vb" />
-    <Compile Include="$(MSBuildThisFileDirectory)Misc\EnumerableQueue.vb" />
-    <Compile Include="$(MSBuildThisFileDirectory)Misc\FileCrawler.vb" />
     <Compile Include="..\PicDedupe.Shared\Controls\FolderListView.vb" />
-    <Compile Include="$(MSBuildThisFileDirectory)Misc\MemorySize.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="$(MSBuildThisFileDirectory)Controls\PathPicker.resx">
       <DependentUpon>PathPicker.vb</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Misc\" />
   </ItemGroup>
 </Project>

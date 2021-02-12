@@ -1,5 +1,5 @@
 ﻿Imports System.IO
-Imports System.Runtime.CompilerServices
+Imports PicDedupe.Generic
 
 Public Class FileCrawler
 
@@ -12,6 +12,8 @@ Public Class FileCrawler
     Private ReadOnly _progressReporter As Action(Of ProgressReportInfo)
     Private ReadOnly _searchPattern As String()
 
+    Private _directoryInfoTree As DirectoryInfoTree
+
     Public Sub New(
         startPath As DirectoryInfo,
         Optional searchPattern() As String = Nothing,
@@ -20,6 +22,8 @@ Public Class FileCrawler
         If Not startPath.Exists Then
             Throw New DirectoryNotFoundException($"Directory {startPath.FullName} does not exist.")
         End If
+
+        _directoryInfoTree = New DirectoryInfoTree(_startPath)
 
         searchPattern = If(searchPattern, New String() {".*"})
 
@@ -34,14 +38,15 @@ Public Class FileCrawler
 
     Public Function GetFiles() As DirectoryInfoTree
 
-        Const EventRaiserCounterThreshold As Integer = 2000
+        Const EventRaiserCounterThreshold As Integer = 500
 
         Dim searchAction As Action
         Dim eventRaiser As Action(Of DirectoryInfoNode)
-        Dim directoryInfoTree = New DirectoryInfoTree(_startPath)
-        Dim currentNode = directoryInfoTree.RootNode
+        Dim currentNode = _directoryInfoTree.RootNode
         Dim currentFileItem As FileInfo = Nothing
         Dim eventRaiseCounter As Integer
+
+        _directoryInfoTree = New DirectoryInfoTree(_startPath)
 
         If _searchPattern.Any(Function(searchPattern) searchPattern = ".*") Then
             searchAction =
@@ -74,7 +79,7 @@ Public Class FileCrawler
 
         For Each directoryItem In ioDirectories
 
-            currentNode = directoryInfoTree.AddDirectory(directoryItem)
+            currentNode = _directoryInfoTree.AddDirectory(directoryItem)
 
             If Not topLevelDirectoriesAvailableFired Then
                 If directoryItem.Parent.FullName <> _startPath.FullName Then
@@ -91,9 +96,9 @@ Public Class FileCrawler
                 files = directoryItem.EnumerateFiles(AllFilesSearchPattern)
                 For Each currentFileItem In files
                     searchAction()
-                    eventRaiser(currentNode)
+                    eventRaiser(RootNode)
                 Next
-                eventRaiser(currentNode)
+                eventRaiser(RootNode)
             Catch ex As Exception
                 ' We swallow this, if EnumerateFiles causes an exception.
             End Try
@@ -101,48 +106,15 @@ Public Class FileCrawler
 
         ' We update now unconditionally.
         eventRaiseCounter = EventRaiserCounterThreshold
-        eventRaiser(currentNode)
+        eventRaiser(RootNode)
 
-        Return directoryInfoTree
+        Return _directoryInfoTree
     End Function
+
+    Public ReadOnly Property RootNode As DirectoryInfoNode
+        Get
+            Return _directoryInfoTree?.RootNode
+        End Get
+    End Property
 
 End Class
-
-Public Module FileInfoExtension
-
-    <Extension>
-    Public Function EnumerateAllSubDirectories(directory As DirectoryInfo, Optional excludeAttributes As FileAttributes = Nothing) As IEnumerable(Of DirectoryInfo)
-
-        Dim queue As EnumerableQueue(Of DirectoryInfo) = Nothing
-
-        ' This is the delegate which gets called on dequeueing each item.
-        ' It practically fills up the queue with the SubItems from that item.
-        ' (If there are any).
-        Dim getSubFolder = New Action(Of DirectoryInfo)(
-            Sub(item)
-                Dim newDirectories As IEnumerable(Of DirectoryInfo) = Nothing
-
-                Try
-                    newDirectories = item.
-                        EnumerateDirectories().
-                        Where(Function(dirItem) Not dirItem.Attributes.HasFlag(excludeAttributes))
-
-                Catch ex As Exception
-                    'We swallow those.
-                End Try
-
-                If newDirectories?.FirstOrDefault IsNot Nothing Then
-                    queue.Queue(newDirectories)
-                End If
-            End Sub)
-
-        queue = New EnumerableQueue(Of DirectoryInfo)(getSubFolder)
-
-        ' We use that delegate here, too, to kick the operation off.
-        ' We start the queue with the direct subfolders of the directory
-        ' we got passed as the start path.
-        getSubFolder(directory)
-
-        Return queue.ToIEnumerable
-    End Function
-End Module

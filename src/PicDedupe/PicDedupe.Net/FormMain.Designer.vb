@@ -1,9 +1,9 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
 Partial Class FormMain
     Inherits System.Windows.Forms.Form
 
     'Form overrides dispose to clean up the component list.
-    <System.Diagnostics.DebuggerNonUserCode()> _
+    <System.Diagnostics.DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
             If disposing AndAlso components IsNot Nothing Then
@@ -20,15 +20,15 @@ Partial Class FormMain
     'NOTE: The following procedure is required by the Windows Form Designer
     'It can be modified using the Windows Form Designer.  
     'Do not modify it using the code editor.
-    <System.Diagnostics.DebuggerStepThrough()> _
+    <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Me.fileCrawlerPathPicker = New PicDedupe.Net.PathPicker()
+        Me.fileCrawlerPathPicker = New PicDedupe.Controls.PathPicker()
         Me.folderSplitter = New System.Windows.Forms.SplitContainer()
-        Me.fileCrawlerFolderListView = New PicDedupe.Net.FolderListView()
+        Me.fileCrawlerFolderListView = New PicDedupe.Controls.FolderListView()
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
         Me.TotalFileSize = New System.Windows.Forms.ToolStripStatusLabel()
         Me.TotalFileCount = New System.Windows.Forms.ToolStripStatusLabel()
-        Me.EllapsedTime = New System.Windows.Forms.ToolStripStatusLabel()
+        Me.ElapsedTime = New System.Windows.Forms.ToolStripStatusLabel()
         CType(Me.folderSplitter, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.folderSplitter.Panel1.SuspendLayout()
         Me.folderSplitter.SuspendLayout()
@@ -77,7 +77,7 @@ Partial Class FormMain
         'StatusStrip1
         '
         Me.StatusStrip1.ImageScalingSize = New System.Drawing.Size(20, 20)
-        Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.TotalFileSize, Me.TotalFileCount, Me.EllapsedTime})
+        Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.TotalFileSize, Me.TotalFileCount, Me.ElapsedTime})
         Me.StatusStrip1.Location = New System.Drawing.Point(0, 624)
         Me.StatusStrip1.Name = "StatusStrip1"
         Me.StatusStrip1.Size = New System.Drawing.Size(1062, 26)
@@ -87,20 +87,23 @@ Partial Class FormMain
         'TotalFileSize
         '
         Me.TotalFileSize.Name = "TotalFileSize"
-        Me.TotalFileSize.Size = New System.Drawing.Size(129, 20)
+        Me.TotalFileSize.Size = New System.Drawing.Size(349, 20)
+        Me.TotalFileSize.Spring = True
         Me.TotalFileSize.Text = "Total file size: - - -"
         '
         'TotalFileCount
         '
         Me.TotalFileCount.Name = "TotalFileCount"
-        Me.TotalFileCount.Size = New System.Drawing.Size(141, 20)
+        Me.TotalFileCount.Size = New System.Drawing.Size(349, 20)
+        Me.TotalFileCount.Spring = True
         Me.TotalFileCount.Text = "Total file count: - - -"
         '
         'EllapsedTime
         '
-        Me.EllapsedTime.Name = "EllapsedTime"
-        Me.EllapsedTime.Size = New System.Drawing.Size(184, 20)
-        Me.EllapsedTime.Text = "Ellapsed Time: not started."
+        Me.ElapsedTime.Name = "EllapsedTime"
+        Me.ElapsedTime.Size = New System.Drawing.Size(349, 20)
+        Me.ElapsedTime.Spring = True
+        Me.ElapsedTime.Text = "Ellapsed Time: not started."
         '
         'FormMain
         '
@@ -122,11 +125,11 @@ Partial Class FormMain
 
     End Sub
 
-    Friend WithEvents fileCrawlerPathPicker As PathPicker
+    Friend WithEvents fileCrawlerPathPicker As PicDedupe.Controls.PathPicker
     Friend WithEvents folderSplitter As SplitContainer
-    Friend WithEvents fileCrawlerFolderListView As FolderListView
+    Friend WithEvents fileCrawlerFolderListView As PicDedupe.Controls.FolderListView
     Friend WithEvents StatusStrip1 As StatusStrip
     Friend WithEvents TotalFileSize As ToolStripStatusLabel
     Friend WithEvents TotalFileCount As ToolStripStatusLabel
-    Friend WithEvents EllapsedTime As ToolStripStatusLabel
+    Friend WithEvents ElapsedTime As ToolStripStatusLabel
 End Class

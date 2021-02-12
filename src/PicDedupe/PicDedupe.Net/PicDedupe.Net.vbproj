@@ -25,6 +25,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\PicDedupe.Controls\PicDedupe.Controls.vbproj" />
+    <ProjectReference Include="..\PicDedupe.Generic\PicDedupe.Generic.vbproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Update="My Project\Application.Designer.vb">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -48,7 +53,5 @@
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
   </ItemGroup>
-
-  <Import Project="..\PicDedupe.Shared\PicDedupe.Shared.projitems" Label="Shared" />
 
 </Project>
