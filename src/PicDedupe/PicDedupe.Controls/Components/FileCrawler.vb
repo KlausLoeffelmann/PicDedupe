@@ -9,10 +9,9 @@ Public Class FileCrawler
     Private Const AllFilesSearchPattern = "*.*"
 
     Private ReadOnly _startPath As DirectoryInfo
-    Private ReadOnly _progressReporter As Action(Of ProgressReportInfo)
     Private ReadOnly _searchPattern As String()
 
-    Private _directoryInfoTree As DirectoryInfoTree
+    Private _directoryInfoTree As FileSystemInfoTree
 
     Public Sub New(
         startPath As DirectoryInfo,
@@ -23,30 +22,27 @@ Public Class FileCrawler
             Throw New DirectoryNotFoundException($"Directory {startPath.FullName} does not exist.")
         End If
 
-        _directoryInfoTree = New DirectoryInfoTree(_startPath)
-
         searchPattern = If(searchPattern, New String() {".*"})
 
         _startPath = startPath
         _searchPattern = searchPattern
-        _progressReporter = progressReporter
+        _directoryInfoTree = New FileSystemInfoTree(_startPath)
     End Sub
 
     Public Function GetTopLevelDirectoriesAsync() As DirectoryInfo()
         Return _startPath.GetDirectories()
     End Function
 
-    Public Function GetFiles() As DirectoryInfoTree
+    Public Function GetFiles() As FileSystemInfoTree
 
-        Const EventRaiserCounterThreshold As Integer = 1000
+        Const EventRaiserCounterThreshold As Integer = 10
 
         Dim searchAction As Action
-        Dim eventRaiser As Action(Of DirectoryInfoNode)
         Dim currentNode = _directoryInfoTree.RootNode
         Dim currentFileItem As FileInfo = Nothing
         Dim eventRaiseCounter As Integer
 
-        _directoryInfoTree = New DirectoryInfoTree(_startPath)
+        _directoryInfoTree = New FileSystemInfoTree(_startPath)
 
         If _searchPattern.Any(Function(searchPattern) searchPattern = ".*") Then
             searchAction =
@@ -62,16 +58,6 @@ Public Class FileCrawler
                 End Sub
         End If
 
-        eventRaiser =
-            Sub(nodeToUpdate)
-                eventRaiseCounter += 1
-                If eventRaiseCounter = EventRaiserCounterThreshold Then
-                    eventRaiseCounter = 0
-                    RaiseEvent ProgressUpdate(Me, ProgressUpdateEventArgs.GetDefault(nodeToUpdate))
-                End If
-            End Sub
-
-        Dim topLevelDirectories = New List(Of DirectoryInfoNode)
         Dim topLevelDirectoriesAvailableFired = False
         Dim fileCount As Integer = 0
 
@@ -83,10 +69,8 @@ Public Class FileCrawler
 
             If Not topLevelDirectoriesAvailableFired Then
                 If directoryItem.Parent.FullName <> _startPath.FullName Then
-                    RaiseEvent TopLevelDirectoriesAvailable(Me, New TopLevelDirectoriesAvailableEventArgs(topLevelDirectories))
+                    RaiseEvent TopLevelDirectoriesAvailable(Me, New TopLevelDirectoriesAvailableEventArgs(rootNode))
                     topLevelDirectoriesAvailableFired = True
-                Else
-                    topLevelDirectories.Add(currentNode)
                 End If
             End If
 
@@ -96,9 +80,9 @@ Public Class FileCrawler
                 files = directoryItem.EnumerateFiles(AllFilesSearchPattern)
                 For Each currentFileItem In files
                     searchAction()
-                    eventRaiser(RootNode)
+                    RaiseEvent ProgressUpdate(Me, ProgressUpdateEventArgs.GetDefault(rootNode))
                 Next
-                eventRaiser(RootNode)
+                RaiseEvent ProgressUpdate(Me, ProgressUpdateEventArgs.GetDefault(rootNode))
             Catch ex As Exception
                 ' We swallow this, if EnumerateFiles causes an exception.
             End Try
@@ -106,12 +90,12 @@ Public Class FileCrawler
 
         ' We update now unconditionally.
         eventRaiseCounter = EventRaiserCounterThreshold
-        eventRaiser(RootNode)
+        RaiseEvent ProgressUpdate(Me, ProgressUpdateEventArgs.GetDefault(rootNode))
 
         Return _directoryInfoTree
     End Function
 
-    Public ReadOnly Property RootNode As DirectoryInfoNode
+    Public ReadOnly Property RootNode As FileSystemInfoNode
         Get
             Return _directoryInfoTree?.RootNode
         End Get

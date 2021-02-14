@@ -1,8 +1,7 @@
 ﻿Public Class ExceptionHandlingEnumerator(Of T)
     Implements IEnumerator(Of T), IEnumerable(Of T)
 
-    Private _enumerator As IEnumerator(Of T)
-    Private disposedValue As Boolean
+    Private ReadOnly _enumerator As IEnumerator(Of T)
 
     Sub New(enumerable As IEnumerable(Of T))
         _enumerator = enumerable.GetEnumerator

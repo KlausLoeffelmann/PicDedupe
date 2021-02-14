@@ -1,28 +1,6 @@
-﻿Imports System.IO
-Imports System.Windows.Forms
-Imports PicDedupe.Generic
+﻿Imports PicDedupe.Generic
 
-Public Class FolderListView
-    Inherits ListView
-
-    Public Sub New()
-        DoubleBuffered = True
-        View = View.Details
-        FullRowSelect = True
-
-        SetupHeader()
-    End Sub
-
-    Private Sub SetupHeader()
-        Me.Columns.Clear()
-        Me.Columns.Add("Foldername", 200, HorizontalAlignment.Left)
-        Me.Columns.Add("Files", 100, HorizontalAlignment.Right)
-        Me.Columns.Add("Size", 200, HorizontalAlignment.Right)
-    End Sub
-
-End Class
-
-Public Class FolderListViewItem
+Public Class FileSystemListViewItem
     Inherits ListViewItem
 
     Private Shared s_fileCountFormatStrings As (valueFormat As String, nullFormat As String) =
@@ -33,9 +11,9 @@ Public Class FolderListViewItem
             value?.ToString(s_fileCountFormatStrings.valueFormat),
             s_fileCountFormatStrings.nullFormat)
 
-    Private ReadOnly _node As DirectoryInfoNode
+    Private ReadOnly _node As FileSystemInfoNode
 
-    Public Sub New(node As DirectoryInfoNode)
+    Public Sub New(node As FileSystemInfoNode)
         MyBase.New(node.Directory.Name)
         Dim subitem = SubItems.Add(s_fileCountFormatter(node.FileCount)) ' File Count
         subitem = SubItems.Add($"{node.FileSize}") ' Folder Size
@@ -47,7 +25,7 @@ Public Class FolderListViewItem
         SubItems(2).Text = $"{Node.FileSize}"
     End Sub
 
-    Public ReadOnly Property Node As DirectoryInfoNode
+    Public ReadOnly Property Node As FileSystemInfoNode
         Get
             Return _node
         End Get

@@ -3,9 +3,9 @@
 Public Class TopLevelDirectoriesAvailableEventArgs
     Inherits EventArgs
 
-    Public Sub New(topLevelDirectories As IEnumerable(Of DirectoryInfoNode))
-        Me.TopLevelDirectories = topLevelDirectories
+    Public Sub New(rootNode As FileSystemInfoNode)
+        Me.RootNode = rootNode
     End Sub
 
-    Public ReadOnly Property TopLevelDirectories As IEnumerable(Of DirectoryInfoNode)
+    Public ReadOnly Property RootNode As FileSystemInfoNode
 End Class

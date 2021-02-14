@@ -5,11 +5,11 @@ Public Class ProgressUpdateEventArgs
 
     Private Shared s_defaultEventArgs As ProgressUpdateEventArgs
 
-    Public Sub New(nodeToUpdate As DirectoryInfoNode)
+    Public Sub New(nodeToUpdate As FileSystemInfoNode)
         Me.NodeToUpdate = nodeToUpdate
     End Sub
 
-    Public Shared Function GetDefault(nodeToUpdate As DirectoryInfoNode) As ProgressUpdateEventArgs
+    Public Shared Function GetDefault(nodeToUpdate As FileSystemInfoNode) As ProgressUpdateEventArgs
         If s_defaultEventArgs Is Nothing Then
             s_defaultEventArgs = New ProgressUpdateEventArgs(nodeToUpdate)
         Else
@@ -21,6 +21,6 @@ Public Class ProgressUpdateEventArgs
         Return s_defaultEventArgs
     End Function
 
-    Public ReadOnly Property NodeToUpdate As DirectoryInfoNode
+    Public ReadOnly Property NodeToUpdate As FileSystemInfoNode
 
 End Class

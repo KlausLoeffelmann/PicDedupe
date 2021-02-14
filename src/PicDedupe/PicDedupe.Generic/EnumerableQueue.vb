@@ -1,8 +1,8 @@
 ﻿Public Class EnumerableQueue(Of T)
     Implements IEnumerable(Of T)
 
-    Private _queue As New Queue(Of T)
-    Private _queueProcessPredicate As Action(Of T)
+    Private ReadOnly _queue As New Queue(Of T)
+    Private ReadOnly _queueProcessPredicate As Action(Of T)
 
     Sub New(queueProcessPredicate As Action(Of T))
         _queueProcessPredicate = queueProcessPredicate

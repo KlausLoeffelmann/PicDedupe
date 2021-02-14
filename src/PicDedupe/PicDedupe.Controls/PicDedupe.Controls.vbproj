@@ -21,7 +21,9 @@
     <OutputPath>bin\Debug\</OutputPath>
     <DocumentationFile>PicDedupe.Controls.xml</DocumentationFile>
     <DefineConstants>_MYFORMS=True</DefineConstants>
-    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+    <NoWarn>
+    </NoWarn>
+    <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -31,7 +33,9 @@
     <OutputPath>bin\Release\</OutputPath>
     <DocumentationFile>PicDedupe.Controls.xml</DocumentationFile>
     <DefineConstants>_MYFORMS=True</DefineConstants>
-    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+    <NoWarn>
+    </NoWarn>
+    <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup>
     <OptionExplicit>On</OptionExplicit>
@@ -40,7 +44,7 @@
     <OptionCompare>Binary</OptionCompare>
   </PropertyGroup>
   <PropertyGroup>
-    <OptionStrict>Off</OptionStrict>
+    <OptionStrict>On</OptionStrict>
   </PropertyGroup>
   <PropertyGroup>
     <OptionInfer>On</OptionInfer>
@@ -72,12 +76,11 @@
   <ItemGroup>
     <Compile Include="Components\FileCrawler.vb" />
     <Compile Include="Components\FileInfoExtension.vb" />
-    <Compile Include="Controls\FileListView.vb">
+    <Compile Include="Controls\FileSystemView.vb">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\FolderListView.vb">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="Controls\FileSystemListViewItem.vb" />
+    <Compile Include="Controls\FolderListViewItemDoubleClickEventArgs.vb" />
     <Compile Include="Controls\PathChangedEventArgs.vb" />
     <Compile Include="Controls\PathPicker.Designer.vb">
       <DependentUpon>PathPicker.vb</DependentUpon>
