@@ -5,8 +5,7 @@ Imports PicDedupe.Generic
 Public Module FileInfoExtension
 
     <Extension>
-    Public Iterator Function EnumerateAllSubDirectories(directory As DirectoryInfo, Optional excludeAttributes As FileAttributes = Nothing) As IEnumerable(Of DirectoryInfo)
-
+    Public Iterator Function EnumerateAllSubDirectories(directory As DirectoryInfo, Optional excludeAttributes As FileAttributes = Nothing) As IEnumerable(Of String)
 
         'We could as well build a queue of IEnurables just with
         'the root path as a base. But that's a visual confusing thing,
@@ -17,12 +16,13 @@ Public Module FileInfoExtension
         'through the root elements one-by-one explicitly, the visual
         'experience for the user is MUCh better, although we allocate
         'somewhat more space due to the iterator.
-        Dim topLevelDirectories As IEnumerable(Of DirectoryInfo) = Nothing
+        Dim topLevelDirectories As IEnumerable(Of String) = Nothing
 
         Try
             topLevelDirectories = directory.
                 EnumerateDirectories().
-                Where(Function(dirItem) Not dirItem.Attributes.HasFlag(excludeAttributes))
+                Where(Function(dirItem) Not dirItem.Attributes.HasFlag(excludeAttributes)).
+                Select(Function(dirItem) dirItem.FullName)
         Catch ex As Exception
         End Try
 
@@ -30,21 +30,23 @@ Public Module FileInfoExtension
             Yield item
         Next
 
-        Dim queue As EnumerableQueue(Of DirectoryInfo) = Nothing
+        Dim queue As EnumerableQueue(Of String) = Nothing
 
         ' This is the delegate which gets called on dequeueing each item.
         ' It practically fills up the queue with the SubItems from that item.
         ' (If there are any).
-        Dim getSubFolder = New Action(Of DirectoryInfo)(
+        Dim getSubFolder = New Action(Of String)(
             Sub(item)
-                Dim newDirectories As IEnumerable(Of DirectoryInfo) = Nothing
+                Dim newDirectories As IEnumerable(Of String) = Nothing
 
                 Try
-                    newDirectories = item.
+                    newDirectories = New DirectoryInfo(item).
                         EnumerateDirectories().
-                        Where(Function(dirItem) Not dirItem.Attributes.HasFlag(excludeAttributes))
+                        Where(Function(dirItem) Not dirItem.Attributes.HasFlag(excludeAttributes)).
+                        Select(Function(dirItem) dirItem.FullName)
 
                 Catch ex As Exception
+                    Throw
                     'We swallow those.
                 End Try
 
@@ -54,7 +56,7 @@ Public Module FileInfoExtension
             End Sub)
 
         For Each item In topLevelDirectories
-            queue = New EnumerableQueue(Of DirectoryInfo)(getSubFolder)
+            queue = New EnumerableQueue(Of String)(getSubFolder)
             getSubFolder(item)
             For Each item2 In queue
                 Yield (item2)

@@ -75,7 +75,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Components\FileCrawler.vb" />
-    <Compile Include="Components\FileInfoExtension.vb" />
     <Compile Include="Controls\FileSystemView.vb">
       <SubType>Component</SubType>
     </Compile>
@@ -88,7 +87,6 @@
     <Compile Include="Controls\PathPicker.vb">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Controls\ProgressReportInfo.vb" />
     <Compile Include="Controls\ProgressUpdateEventArgs.vb" />
     <Compile Include="Controls\TopLevelDirectoriesAvailableEventArgs.vb" />
     <Compile Include="My Project\Application.Designer.vb">
@@ -133,8 +131,30 @@
     <Service Include="{94E38DFF-614B-4cbd-B67C-F211BB35CE8B}" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Controls\Resources\document_32xLG.png" />
+    <None Include="Controls\Resources\folder_Closed_32xLG.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Controls\Resources\document_16xLG.png" />
+    <None Include="Controls\Resources\document_16xMD.png" />
+    <None Include="Controls\Resources\document_16xSM.png" />
+    <None Include="Controls\Resources\document_32xMD.png" />
+    <None Include="Controls\Resources\document_32xSM.png" />
+    <None Include="Controls\Resources\folder_Closed_16xLG.png" />
+    <None Include="Controls\Resources\folder_Closed_16xMD.png" />
+    <None Include="Controls\Resources\folder_Closed_16xSM.png" />
+    <None Include="Controls\Resources\folder_Closed_32xMD.png" />
+    <None Include="Controls\Resources\folder_Closed_32xSM.png" />
+    <None Include="Controls\Resources\folder_Open_16xLG.png" />
+    <None Include="Controls\Resources\folder_Open_16xMD.png" />
+    <None Include="Controls\Resources\folder_Open_16xSM.png" />
+    <None Include="Controls\Resources\folder_Open_32xLG.png" />
+    <None Include="Controls\Resources\folder_Open_32xMD.png" />
+    <None Include="Controls\Resources\folder_Open_32xSM.png" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\PicDedupe.Generic\PicDedupe.Generic.vbproj">
-      <Project>{b532f17e-2cd0-46c9-9fba-783009bb1fe0}</Project>
+      <Project>{B532F17E-2CD0-46C9-9FBA-783009BB1FE0}</Project>
       <Name>PicDedupe.Generic</Name>
     </ProjectReference>
   </ItemGroup>

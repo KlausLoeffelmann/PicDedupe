@@ -52,7 +52,7 @@ Public Class FormMain
         Invoke(
             Sub()
                 For Each item In e.RootNode.Nodes
-                    Me.fileCrawlerFolderListView.Items.Add(New FileSystemListViewItem(item))
+                    Me.fileCrawlerFolderListView.Items.Add(New FileSystemListViewItem(item.Value))
                 Next
                 UpdateStatusBar(_fileCrawler.RootNode)
             End Sub)
@@ -65,7 +65,7 @@ Public Class FormMain
 
         Dim directoryTree = Await Task.Run(
             Function()
-                _fileCrawler = New FileCrawler(New IO.DirectoryInfo(path))
+                _fileCrawler = New FileCrawler(path)
 
                 AddHandler _fileCrawler.ProgressUpdate,
                     AddressOf FileCrawler_ProgressUpdate

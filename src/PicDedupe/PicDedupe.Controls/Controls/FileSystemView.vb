@@ -4,12 +4,19 @@ Imports System.Windows.Forms
 Public Class FileSystemView
     Inherits ListView
 
+    Private _imageList As ImageList = New ImageList
+
     Public Event FolderListViewItemDoubleClick(sender As Object, e As FolderListViewItemDoubleClickEventArgs)
 
     Public Sub New()
         DoubleBuffered = True
         View = View.Details
         FullRowSelect = True
+
+        _imageList.ImageSize = New Size(24, 24)
+        _imageList.Images.Add("Folder", My.Resources.folder_Closed_32xLG)
+        _imageList.Images.Add("Doc", My.Resources.document_32xLG)
+        SmallImageList = _imageList
 
         SetupHeader()
     End Sub

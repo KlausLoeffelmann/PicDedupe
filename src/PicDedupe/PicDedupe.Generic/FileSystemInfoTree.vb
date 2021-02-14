@@ -1,60 +1,27 @@
 ﻿Imports System.IO
+Imports IoPath = System.IO.Path
 
 Public Class FileSystemInfoTree
 
     Private _lastNodeAdded As FileSystemInfoNode
-    Private ReadOnly _nodeDirectorynameStack As New Stack(Of String)
 
-    Public Sub New(rootDirectory As DirectoryInfo)
-        RootNode = FileSystemInfoNode.CreateRootNode(rootDirectory)
+    Public Sub New(rootPath As String)
+        RootNode = FileSystemInfoNode.CreateRootNode(rootPath)
     End Sub
 
-    Public Function AddDirectory(directory As DirectoryInfo) As FileSystemInfoNode
-
-        If _lastNodeAdded Is Nothing Then
-            If RootNode.Directory.FullName = directory.Parent.FullName Then
-                _lastNodeAdded = RootNode.AddDirectory(directory, Nothing)
-                Return _lastNodeAdded
-            End If
-        End If
-
-        If _lastNodeAdded.ParentNode.Directory.FullName = directory.Parent.FullName Then
-            _lastNodeAdded = _lastNodeAdded.ParentNode.AddDirectory(directory, _lastNodeAdded.TopLevelNode)
-            Return _lastNodeAdded
+    Public Function AddDirectory(path As String) As FileSystemInfoNode
+        If Not path.StartsWith(RootNode.Path) Then
+            Throw New ArgumentException($"Root of 'path' does not match the root node's path: {path}")
         Else
-            ' Find Root and store the Nodes up the Hirachy on the way
-            Dim currentDirectory = directory
-            Do While currentDirectory.Parent IsNot Nothing AndAlso currentDirectory.FullName <> RootNode.Directory.FullName
-                currentDirectory = currentDirectory.Parent
-                _nodeDirectorynameStack.Push(currentDirectory.Name)
-            Loop
-
-            ' We don't need to look for the root name in the root name,
-            ' we start the search one level below.
-            _nodeDirectorynameStack.Pop()
-
-            If currentDirectory.FullName <> RootNode.Directory.FullName AndAlso currentDirectory.Parent Is Nothing Then
-                Throw New ArgumentException($"Directory does not match the root path: {directory.FullName}")
-            End If
-
-            Dim currentNode = RootNode
-            Dim newCurrentNode As FileSystemInfoNode = Nothing
-            Dim topLevelNode As FileSystemInfoNode = Nothing
-
-            Dim pathPart As String
-            Do While _nodeDirectorynameStack.Count > 0
-                pathPart = _nodeDirectorynameStack.Pop
-                If currentNode.TryGetNode(pathPart, newCurrentNode) Then
-                    currentNode = newCurrentNode
-                    If topLevelNode Is Nothing Then
-                        topLevelNode = currentNode
-                    End If
-                Else
-                    Throw New ArgumentException($"Directory does not match the root path: {directory.FullName}")
+            Dim remainingPathName = path.Substring(RootNode.Path.Length + 1)
+            Dim remainingPaths = remainingPathName.Split(IoPath.DirectorySeparatorChar)
+            Dim searchNode = RootNode
+            For i = 0 To remainingPaths.Length - 2
+                If (Not searchNode.TryGetNode(remainingPaths(i), searchNode)) Then
+                    Throw New ArgumentException($"Couldn't find one of the ancestor nodes in the node structore: {path}")
                 End If
-            Loop
-
-            Return currentNode.AddDirectory(directory, topLevelNode)
+            Next
+            Return searchNode.AddDirectory(path)
         End If
     End Function
 
@@ -62,63 +29,65 @@ Public Class FileSystemInfoTree
 End Class
 
 Public Class FileSystemInfoNode
-    Private ReadOnly _fileSystemItems As New Dictionary(Of String, FileSystemInfoNode)
-    Private ReadOnly _nodes As New List(Of FileSystemInfoNode)
-    Private ReadOnly _item As FileSystemInfo
+    Private ReadOnly _nodes As New Dictionary(Of String, FileSystemInfoNode)
     Private _fileCount As Integer
     Private _fileSize As ULong
     Private _parentNode As FileSystemInfoNode
     Private _topLevelNode As FileSystemInfoNode
+    Private _path As String
 
-    Private Sub New(item As FileSystemInfo)
-        _item = item
-        IsDirectory = TypeOf item Is DirectoryInfo
+    Private Sub New(fullpath As String, isDirectory As Boolean, Optional isTopLevelNode As Boolean = False)
+        _path = fullpath
+        Me.IsDirectory = isDirectory
+
+        If isTopLevelNode Then
+            TopLevelNode = Me
+        End If
     End Sub
 
-    Public Shared Function CreateRootNode(directory As DirectoryInfo) As FileSystemInfoNode
-        Return New FileSystemInfoNode(directory)
+    Public Shared Function CreateRootNode(directoryPath As String) As FileSystemInfoNode
+        Return New FileSystemInfoNode(directoryPath, True, True)
     End Function
 
-    Public Function AddDirectory(directory As DirectoryInfo, toplevelNode As FileSystemInfoNode) As FileSystemInfoNode
-        If directory Is Nothing Then
-            Throw New ArgumentNullException(NameOf(directory))
+    Public Function AddDirectory(path As String) As FileSystemInfoNode
+        If path Is Nothing Then
+            Throw New ArgumentNullException(NameOf(path))
         End If
 
-        If directory.Parent.FullName <> _item.FullName Then
-            Throw New ArgumentException($"Directory's Root does not match Parent's directory's root: {directory}")
+        If IoPath.GetDirectoryName(path) <> _path Then
+            Throw New ArgumentException($"Directory's Root does not match Parent's directory's root: {path}")
         End If
 
-        Dim node = New FileSystemInfoNode(directory) With
+        Dim node = New FileSystemInfoNode(path, True) With
         {
             ._parentNode = Me
         }
-        node.TopLevelNode = toplevelNode
-        _nodes.Add(node)
-        Try
-            _fileSystemItems.Add(directory.Name, node)
-        Catch ex As Exception
 
-        End Try
+        node.TopLevelNode = TopLevelNode
+        ' We want just the name of the Directory, not the full path.
+        ' So using GetFileName for this is just fine.
+        _nodes.Add(IoPath.GetFileName(path), node)
+
         Return node
     End Function
 
-    Public Sub AddFile(file As FileInfo)
-        If file Is Nothing Then
-            Throw New ArgumentNullException(NameOf(file))
+    Public Sub AddFile(path As String, fileSize As Long)
+        If path Is Nothing Then
+            Throw New ArgumentNullException(NameOf(path))
         End If
 
-        If file.Directory.FullName <> _item.FullName Then
-            Throw New ArgumentException($"Files's path does not match nodes's directory's path: {file}")
+        If IO.Path.GetDirectoryName(path) <> _path Then
+            Throw New ArgumentException($"Files's path does not match nodes's directory's path: {path}")
         End If
 
-        Dim node = New FileSystemInfoNode(file) With
+        Dim node = New FileSystemInfoNode(path, False) With
         {
             ._parentNode = Me
         }
 
-        _fileSystemItems.Add(file.Name, node)
+        _nodes.Add(IO.Path.GetFileName(path), node)
         UpdateCount()
-        UpdateSize(CULng(file.Length))
+        UpdateSize(CULng(fileSize))
     End Sub
 
     Private Sub UpdateCount()
@@ -131,8 +100,8 @@ Public Class FileSystemInfoNode
         ParentNode?.UpdateSize(size)
     End Sub
 
-    Public Function TryGetNode(directoryName As String, ByRef node As FileSystemInfoNode) As Boolean
-        Return _fileSystemItems.TryGetValue(directoryName, node)
+    Public Function TryGetNode(path As String, ByRef node As FileSystemInfoNode) As Boolean
+        Return _nodes.TryGetValue(path, node)
     End Function
 
     Public ReadOnly Property FileCount As Integer
@@ -149,28 +118,25 @@ Public Class FileSystemInfoNode
 
     Public ReadOnly Property IsDirectory As Boolean
 
-    Public ReadOnly Property Directory As DirectoryInfo
-        Get
-            Return If(
-                IsDirectory,
-                DirectCast(_item, DirectoryInfo),
-                Nothing)
-        End Get
-    End Property
-
     Public ReadOnly Property ParentNode As FileSystemInfoNode
         Get
             Return _parentNode
         End Get
     End Property
 
-    Public ReadOnly Property Files As IReadOnlyList(Of FileInfo)
+    Public ReadOnly Property Path As String
         Get
-            Return _fileSystemItems.Values.OfType(Of FileInfo).ToList()
+            Return _path
         End Get
     End Property
 
-    Public ReadOnly Property Nodes As List(Of FileSystemInfoNode)
+    Public ReadOnly Property Name As String
+        Get
+            Return IoPath.GetFileName(Path)
+        End Get
+    End Property
+
+    Public ReadOnly Property Nodes As Dictionary(Of String, FileSystemInfoNode)
         Get
             Return _nodes
         End Get
@@ -184,5 +150,4 @@ Public Class FileSystemInfoNode
             _topLevelNode = value
         End Set
     End Property
-
 End Class

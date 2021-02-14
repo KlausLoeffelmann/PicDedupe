@@ -14,7 +14,7 @@ Public Class FileSystemListViewItem
     Private ReadOnly _node As FileSystemInfoNode
 
     Public Sub New(node As FileSystemInfoNode)
-        MyBase.New(node.Directory.Name)
+        MyBase.New(node.Name, If(node.IsDirectory, "Folder", "Doc"))
         Dim subitem = SubItems.Add(s_fileCountFormatter(node.FileCount)) ' File Count
         subitem = SubItems.Add($"{node.FileSize}") ' Folder Size
         _node = node

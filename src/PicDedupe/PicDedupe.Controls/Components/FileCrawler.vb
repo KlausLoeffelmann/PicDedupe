@@ -8,18 +8,17 @@ Public Class FileCrawler
 
     Private Const AllFilesSearchPattern = "*.*"
 
-    Private ReadOnly _startPath As DirectoryInfo
+    Private ReadOnly _startPath As String
     Private ReadOnly _searchPattern As String()
 
     Private _directoryInfoTree As FileSystemInfoTree
 
     Public Sub New(
-        startPath As DirectoryInfo,
-        Optional searchPattern() As String = Nothing,
-        Optional progressReporter As Action(Of ProgressReportInfo) = Nothing)
+        startPath As String,
+        Optional searchPattern() As String = Nothing)
 
-        If Not startPath.Exists Then
-            Throw New DirectoryNotFoundException($"Directory {startPath.FullName} does not exist.")
+        If Not New DirectoryInfo(startPath).Exists Then
+            Throw New DirectoryNotFoundException($"Directory {startPath} does not exist.")
         End If
 
         searchPattern = If(searchPattern, New String() {".*"})
@@ -29,31 +28,28 @@ Public Class FileCrawler
         _directoryInfoTree = New FileSystemInfoTree(_startPath)
     End Sub
 
-    Public Function GetTopLevelDirectoriesAsync() As DirectoryInfo()
-        Return _startPath.GetDirectories()
-    End Function
-
     Public Function GetFiles() As FileSystemInfoTree
 
         Const EventRaiserCounterThreshold As Integer = 10
 
-        Dim searchAction As Action
+        Dim searchAction As Action(Of String, Long)
         Dim currentNode = _directoryInfoTree.RootNode
-        Dim currentFileItem As FileInfo = Nothing
+        Dim currentFile As String = Nothing
         Dim eventRaiseCounter As Integer
 
         _directoryInfoTree = New FileSystemInfoTree(_startPath)
 
         If _searchPattern.Any(Function(searchPattern) searchPattern = ".*") Then
             searchAction =
-                Sub()
-                    currentNode.AddFile(currentFileItem)
+                Sub(file, size)
+                    currentNode.AddFile(file, size)
                 End Sub
         Else
             searchAction =
-                Sub()
-                    If _searchPattern.Any(Function(searchPattern) searchPattern = currentFileItem.Extension) Then
-                        currentNode.AddFile(currentFileItem)
+                Sub(file, size)
+                    Dim fileExtension = Path.GetExtension(file)
+                    If _searchPattern.Any(Function(searchPattern) searchPattern = fileExtension) Then
+                        currentNode.AddFile(file, size)
                     End If
                 End Sub
         End If
@@ -61,36 +57,37 @@ Public Class FileCrawler
         Dim topLevelDirectoriesAvailableFired = False
         Dim fileCount As Integer = 0
 
-        Dim ioDirectories = _startPath.EnumerateAllSubDirectories(FileAttributes.Hidden Or FileAttributes.System)
+        Dim ioDirectories = New DirectoryInfo(_startPath).EnumerateAllSubDirectories(FileAttributes.Hidden Or FileAttributes.System)
 
         For Each directoryItem In ioDirectories
 
             currentNode = _directoryInfoTree.AddDirectory(directoryItem)
 
+            Dim files As IEnumerable(Of FileInfo) = Nothing
+
+            Try
+                files = New DirectoryInfo(directoryItem).EnumerateFiles(AllFilesSearchPattern)
+                For Each currentFileItem In files
+                    searchAction(currentFileItem.FullName, currentFileItem.Length)
+                    RaiseEvent ProgressUpdate(Me, ProgressUpdateEventArgs.GetDefault(RootNode))
+                Next
+                RaiseEvent ProgressUpdate(Me, ProgressUpdateEventArgs.GetDefault(RootNode))
+            Catch ex As Exception
+                ' We swallow this, if EnumerateFiles causes an exception.
+            End Try
+
             If Not topLevelDirectoriesAvailableFired Then
-                If directoryItem.Parent.FullName <> _startPath.FullName Then
-                    RaiseEvent TopLevelDirectoriesAvailable(Me, New TopLevelDirectoriesAvailableEventArgs(rootNode))
+                If Path.GetDirectoryName(directoryItem) <> _startPath Then
+                    RaiseEvent TopLevelDirectoriesAvailable(Me, New TopLevelDirectoriesAvailableEventArgs(RootNode))
                     topLevelDirectoriesAvailableFired = True
                 End If
             End If
 
-            Dim files As IEnumerable(Of FileInfo) = Nothing
-
-            Try
-                files = directoryItem.EnumerateFiles(AllFilesSearchPattern)
-                For Each currentFileItem In files
-                    searchAction()
-                    RaiseEvent ProgressUpdate(Me, ProgressUpdateEventArgs.GetDefault(rootNode))
-                Next
-                RaiseEvent ProgressUpdate(Me, ProgressUpdateEventArgs.GetDefault(rootNode))
-            Catch ex As Exception
-                ' We swallow this, if EnumerateFiles causes an exception.
-            End Try
         Next
 
         ' We update now unconditionally.
         eventRaiseCounter = EventRaiserCounterThreshold
-        RaiseEvent ProgressUpdate(Me, ProgressUpdateEventArgs.GetDefault(rootNode))
+        RaiseEvent ProgressUpdate(Me, ProgressUpdateEventArgs.GetDefault(RootNode))
 
         Return _directoryInfoTree
     End Function
