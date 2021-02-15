@@ -11,21 +11,21 @@ Public Class FileSystemListViewItem
             value?.ToString(s_fileCountFormatStrings.valueFormat),
             s_fileCountFormatStrings.nullFormat)
 
-    Private ReadOnly _node As FileSystemInfoNode
+    Private ReadOnly _node As FileEntryNode
 
-    Public Sub New(node As FileSystemInfoNode)
+    Public Sub New(node As FileEntryNode)
         MyBase.New(node.Name, If(node.IsDirectory, "Folder", "Doc"))
         Dim subitem = SubItems.Add(s_fileCountFormatter(node.FileCount)) ' File Count
-        subitem = SubItems.Add($"{node.FileSize}") ' Folder Size
+        subitem = SubItems.Add($"{CType(node.Length, MemorySize)}") ' Folder Size
         _node = node
     End Sub
 
     Public Sub UpdateItem()
         SubItems(1).Text = s_fileCountFormatter(Node.FileCount)
-        SubItems(2).Text = $"{Node.FileSize}"
+        SubItems(2).Text = $"{CType(Node.Length, MemorySize)}"
     End Sub
 
-    Public ReadOnly Property Node As FileSystemInfoNode
+    Public ReadOnly Property Node As FileEntryNode
         Get
             Return _node
         End Get

@@ -11,7 +11,7 @@ Public Class FileCrawler
     Private ReadOnly _startPath As String
     Private ReadOnly _searchPattern As String()
 
-    Private _directoryInfoTree As FileSystemInfoTree
+    Private _fileEntryTreeTree As FileEntryTree
     Private _fileItemEnumerator As IFileItemEnumerator
 
     Public Sub New(
@@ -26,78 +26,67 @@ Public Class FileCrawler
 
         _startPath = startPath
         _searchPattern = searchPattern
-        _directoryInfoTree = New FileSystemInfoTree(_startPath)
+        _fileEntryTreeTree = New FileEntryTree(_startPath)
     End Sub
 
-    Public Function GetFiles() As FileSystemInfoTree
+    Public Function GetFiles() As FileEntryTree
 
-        Const EventRaiserCounterThreshold As Integer = 10
-
-        Dim searchAction As Action(Of String, Long)
-        Dim currentNode = _directoryInfoTree.RootNode
+        Dim entryFilter As Func(Of FileEntry, Boolean)
+        Dim currentNode = _fileEntryTreeTree.RootNode
         Dim currentFile As String = Nothing
-        Dim eventRaiseCounter As Integer
 
-        _directoryInfoTree = New FileSystemInfoTree(_startPath)
+        _fileEntryTreeTree = New FileEntryTree(_startPath)
 
         If _searchPattern.Any(Function(searchPattern) searchPattern = ".*") Then
-            searchAction =
-                Sub(file, size)
-                    currentNode.AddFile(file, size)
-                End Sub
+            entryFilter = Function(entry) entry.IsDirectory
         Else
-            searchAction =
-                Sub(file, size)
-                    Dim fileExtension = Path.GetExtension(file)
-                    If _searchPattern.Any(Function(searchPattern) searchPattern = fileExtension) Then
-                        currentNode.AddFile(file, size)
-                    End If
-                End Sub
+            entryFilter = Function(entry) _
+                entry.IsDirectory AndAlso
+                _searchPattern.Any(Function(searchPattern) searchPattern = Path.GetExtension(entry.Path))
         End If
 
         Dim topLevelDirectoriesAvailableFired = False
         Dim fileCount As Integer = 0
 
-        Dim ioDirectories = FileItemEnumerator.EnumerateDirectoriesRecursively(
+        'We first get the first-level subdirectories of our start path.
+
+        'We could as well get all the subfolders of the start path 
+        'recursively right away. But that's a visualy confusing thing,
+        'because in the ListView the element's progress would not be shown one by one, 
+        'from top to bottom, but in a permanent cycle (top-->down, top-->down, ...).
+
+        'When we first get and process the root elements, and then iterate
+        'through the root elements one-by-one explicitly, the visual
+        'experience for the user is MUCH better.
+
+        Dim topLevelEntries = FileItemEnumerator.EnumerateEntries(
             _startPath,
             FileAttributes.Hidden Or FileAttributes.System)
 
-        For Each directoryItem In ioDirectories
-
-            currentNode = _directoryInfoTree.AddDirectory(directoryItem)
-
-            Dim files As IEnumerable(Of FileInfo) = Nothing
-
-            Try
-                files = New DirectoryInfo(directoryItem).EnumerateFiles(AllFilesSearchPattern)
-                For Each currentFileItem In files
-                    searchAction(currentFileItem.FullName, currentFileItem.Length)
-                    RaiseEvent ProgressUpdate(Me, ProgressUpdateEventArgs.GetDefault(RootNode))
-                Next
-                RaiseEvent ProgressUpdate(Me, ProgressUpdateEventArgs.GetDefault(RootNode))
-            Catch ex As Exception
-                ' We swallow this, if EnumerateFiles causes an exception.
-            End Try
-
-            If Not topLevelDirectoriesAvailableFired Then
-                If Path.GetDirectoryName(directoryItem) <> _startPath Then
-                    RaiseEvent TopLevelDirectoriesAvailable(Me, New TopLevelDirectoriesAvailableEventArgs(RootNode))
-                    topLevelDirectoriesAvailableFired = True
-                End If
-            End If
-
+        For Each fileEntry In topLevelEntries
+            If entryFilter(fileEntry) Then Continue For
+            currentNode = _fileEntryTreeTree.AddEntry(fileEntry)
         Next
 
-        ' We update now unconditionally.
-        eventRaiseCounter = EventRaiserCounterThreshold
-        RaiseEvent ProgressUpdate(Me, ProgressUpdateEventArgs.GetDefault(RootNode))
+        RaiseEvent TopLevelDirectoriesAvailable(Me, New TopLevelDirectoriesAvailableEventArgs(RootNode))
 
-        Return _directoryInfoTree
+        For Each fileEntry In topLevelEntries
+            Dim subEntries = FileItemEnumerator.EnumerateEntriesRecursively(
+                _startPath,
+                FileAttributes.Hidden Or FileAttributes.System)
+            For Each subEntry In subEntries
+                If entryFilter(fileEntry) Then Continue For
+                currentNode = _fileEntryTreeTree.AddEntry(subEntry)
+                RaiseEvent ProgressUpdate(Me, ProgressUpdateEventArgs.GetDefault(RootNode))
+            Next
+        Next
+
+        Return _fileEntryTreeTree
     End Function
 
-    Public ReadOnly Property RootNode As FileSystemInfoNode
+    Public ReadOnly Property RootNode As FileEntryNode
         Get
-            Return _directoryInfoTree?.RootNode
+            Return _fileEntryTreeTree?.RootNode
         End Get
     End Property
 
@@ -106,7 +95,9 @@ Public Class FileCrawler
             If _fileItemEnumerator Is Nothing Then
                 _fileItemEnumerator = New FileItemEnumerator()
             End If
+            Return _fileItemEnumerator
         End Get
+
         Set(value As IFileItemEnumerator)
             If value Is Nothing Then
                 Throw New ArgumentNullException(NameOf(value))
@@ -114,5 +105,4 @@ Public Class FileCrawler
             _fileItemEnumerator = value
         End Set
     End Property
-
 End Class

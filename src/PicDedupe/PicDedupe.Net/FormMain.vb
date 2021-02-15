@@ -80,8 +80,8 @@ Public Class FormMain
 
     End Function
 
-    Private Sub UpdateStatusBar(directoryNode As FileSystemInfoNode)
-        TotalFileSize.Text = $"Total file size: {directoryNode.FileSize}"
+    Private Sub UpdateStatusBar(directoryNode As FileEntryNode)
+        TotalFileSize.Text = $"Total file size: {CType(directoryNode.Length, MemorySize)}"
         TotalFileCount.Text = $"Total file count: {directoryNode.FileCount:#,##0)}"
         ElapsedTime.Text = $"Elapsed time: {_stopWatch.Elapsed:hh\:mm\:ss}"
         Dim itemsPerSecond = CInt(1000 / UpdateInterval * (directoryNode.FileCount - _lastItemCount))

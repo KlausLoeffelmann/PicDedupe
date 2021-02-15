@@ -35,6 +35,7 @@ Public Structure MemorySize
         Get
             Return s_defaultDecimalPlaces
         End Get
+
         Set(value As Byte)
             If value > s_decimalPlacecFormatStrings.Length Then
                 Throw New ArgumentException($"Formatting is limitted to {s_decimalPlacecFormatStrings.Length} decimal places.")

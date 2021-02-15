@@ -9,7 +9,7 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "PicDedupe.Framework", "PicD
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "PicDedupe.Controls", "PicDedupe.Controls\PicDedupe.Controls.vbproj", "{8E9A8979-2E93-44C8-B918-C3084A3A704A}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "PicDedupe.Generic", "PicDedupe.Generic\PicDedupe.Generic.vbproj", "{B532F17E-2CD0-46C9-9FBA-783009BB1FE0}"
+Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "PicDedupe.Generic", "PicDedupe.Generic\PicDedupe.Generic.vbproj", "{B532F17E-2CD0-46C9-9FBA-783009BB1FE0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
