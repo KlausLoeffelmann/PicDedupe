@@ -12,6 +12,7 @@ Public Class FileCrawler
     Private ReadOnly _searchPattern As String()
 
     Private _directoryInfoTree As FileSystemInfoTree
+    Private _fileItemEnumerator As IFileItemEnumerator
 
     Public Sub New(
         startPath As String,
@@ -57,7 +58,9 @@ Public Class FileCrawler
         Dim topLevelDirectoriesAvailableFired = False
         Dim fileCount As Integer = 0
 
-        Dim ioDirectories = New DirectoryInfo(_startPath).EnumerateAllSubDirectories(FileAttributes.Hidden Or FileAttributes.System)
+        Dim ioDirectories = FileItemEnumerator.EnumerateDirectoriesRecursively(
+            _startPath,
+            FileAttributes.Hidden Or FileAttributes.System)
 
         For Each directoryItem In ioDirectories
 
@@ -96,6 +99,20 @@ Public Class FileCrawler
         Get
             Return _directoryInfoTree?.RootNode
         End Get
+    End Property
+
+    Public Property FileItemEnumerator As IFileItemEnumerator
+        Get
+            If _fileItemEnumerator Is Nothing Then
+                _fileItemEnumerator = New FileItemEnumerator()
+            End If
+        End Get
+        Set(value As IFileItemEnumerator)
+            If value Is Nothing Then
+                Throw New ArgumentNullException(NameOf(value))
+            End If
+            _fileItemEnumerator = value
+        End Set
     End Property
 
 End Class

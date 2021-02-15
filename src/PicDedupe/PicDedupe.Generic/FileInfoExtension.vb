@@ -1,13 +1,16 @@
 ﻿Imports System.IO
-Imports System.Runtime.CompilerServices
-Imports PicDedupe.Generic
 
-Public Module FileInfoExtension
+Public Interface IFileItemEnumerator
+    Function EnumerateDirectoriesRecursively(rootPath As String, Optional excludeAttributes As FileAttributes = Nothing) As IEnumerable(Of String)
+    Function EnumerateDirectoryFiles(path As String, Optional excludeAttributes As FileAttributes = Nothing) As IEnumerable(Of String)
+End Interface
 
-    <Extension>
-    Public Iterator Function EnumerateAllSubDirectories(directory As DirectoryInfo, Optional excludeAttributes As FileAttributes = Nothing) As IEnumerable(Of String)
+Public Class FileItemEnumerator
+    Implements IFileItemEnumerator
 
-        'We could as well build a queue of IEnurables just with
+    Public Iterator Function EnumerateDirectoriesRecursively(rootPath As String, Optional excludeAttributes As FileAttributes = 0) As IEnumerable(Of String) Implements IFileItemEnumerator.EnumerateDirectoriesRecursively
+
+        'We could as well build a queue of IEnumerable just with
         'the root path as a base. But that's a visual confusing thing,
         'because in the ListView the elements get analyzed not one by one, top-->down
         'but in a cycle (top-->down, top-->down, ...).
@@ -19,7 +22,7 @@ Public Module FileInfoExtension
         Dim topLevelDirectories As IEnumerable(Of String) = Nothing
 
         Try
-            topLevelDirectories = directory.
+            topLevelDirectories = New DirectoryInfo(rootPath).
                 EnumerateDirectories().
                 Where(Function(dirItem) Not dirItem.Attributes.HasFlag(excludeAttributes)).
                 Select(Function(dirItem) dirItem.FullName)
@@ -63,4 +66,8 @@ Public Module FileInfoExtension
             Next
         Next
     End Function
-End Module
+
+    Public Function EnumerateDirectoryFiles(path As String, Optional excludeAttributes As FileAttributes = 0) As IEnumerable(Of String) Implements IFileItemEnumerator.EnumerateDirectoryFiles
+        Throw New NotImplementedException()
+    End Function
+End Class
