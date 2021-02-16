@@ -8,6 +8,7 @@ Public Class FileEntryTree
 
     Public Sub New(rootPath As String)
         RootNode = FileEntryNode.CreateRootNode(rootPath)
+        _lastNodeAddedTo = RootNode
     End Sub
 
     Public Function AddEntry(fileEntry As FileEntry) As FileEntryNode
@@ -46,11 +47,12 @@ Public Class FileEntryTree
         End If
 
         Dim directoryName = IoPath.GetDirectoryName(path)
+
         If directoryName = _lastNodeAddedTo.Path Then
             Return _lastNodeAddedTo
         End If
 
-        If directoryName = _lastNodeAdded.Path Then
+        If directoryName = _lastNodeAdded?.Path Then
             Return _lastNodeAdded
         End If
 

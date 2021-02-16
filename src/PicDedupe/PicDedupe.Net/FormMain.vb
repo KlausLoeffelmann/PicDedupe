@@ -22,14 +22,12 @@ Public Class FormMain
             .Interval = 1000,
             .Enabled = True
         }
+
+        AddHandler _timer.Tick, Sub() CurrentTime.Text = $"Time: {Now.ToLongTimeString}"
     End Sub
 
     Private Async Sub fileCrawlerPathPicker_PathChanged(sender As Object, e As PathChangedEventArgs) Handles fileCrawlerPathPicker.PathChanged
         Await UpdatePathView(e.Path)
-    End Sub
-
-    Private Sub _timer_Tick(sender As Object, e As EventArgs)
-        CurrentTime.Text = Date.Now.ToShortTimeString
     End Sub
 
     Private Sub FileCrawler_ProgressUpdate(sender As Object, e As ProgressUpdateEventArgs)

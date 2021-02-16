@@ -38,11 +38,9 @@ Public Class FileCrawler
         _fileEntryTreeTree = New FileEntryTree(_startPath)
 
         If _searchPattern.Any(Function(searchPattern) searchPattern = ".*") Then
-            entryFilter = Function(entry) entry.IsDirectory
+            entryFilter = Function(entry) True
         Else
-            entryFilter = Function(entry) _
-                entry.IsDirectory AndAlso
-                _searchPattern.Any(Function(searchPattern) searchPattern = Path.GetExtension(entry.Path))
+            entryFilter = Function(entry) _searchPattern.Any(Function(searchPattern) searchPattern = Path.GetExtension(entry.Path))
         End If
 
         Dim topLevelDirectoriesAvailableFired = False
@@ -64,7 +62,7 @@ Public Class FileCrawler
             FileAttributes.Hidden Or FileAttributes.System)
 
         For Each fileEntry In topLevelEntries
-            If entryFilter(fileEntry) Then Continue For
+            If Not entryFilter(fileEntry) Then Continue For
             currentNode = _fileEntryTreeTree.AddEntry(fileEntry)
         Next
 
@@ -74,8 +72,9 @@ Public Class FileCrawler
             Dim subEntries = FileItemEnumerator.EnumerateEntriesRecursively(
                 _startPath,
                 FileAttributes.Hidden Or FileAttributes.System)
+
             For Each subEntry In subEntries
-                If entryFilter(fileEntry) Then Continue For
+                If Not entryFilter(fileEntry) Then Continue For
                 currentNode = _fileEntryTreeTree.AddEntry(subEntry)
                 RaiseEvent ProgressUpdate(Me, ProgressUpdateEventArgs.GetDefault(RootNode))
             Next

@@ -3,7 +3,10 @@
 Public Class FileEntryNode
     Inherits FileEntry
 
-    Private ReadOnly _nodes As New Dictionary(Of String, FileEntryNode)
+    ' The name alone can't work as key, because a folder and a file 
+    ' can have the exact same name any given directory.
+    ' So, we have a Tuple of (name, isDirecotry) as the unique key.
+    Private ReadOnly _nodes As New Dictionary(Of (name As String, isDirectory As Boolean), FileEntryNode)
     Private _fileCount As Integer
     Private _parentNode As FileEntryNode
     Private _topLevelNode As FileEntryNode
@@ -30,7 +33,7 @@ Public Class FileEntryNode
             Throw New ArgumentNullException(NameOf(path))
         End If
 
-        If IoPath.GetDirectoryName(path) <> path Then
+        If IoPath.GetDirectoryName(path) <> Me.Path Then
             Throw New ArgumentException($"Directory's Root does not match Parent's directory's root: {path}")
         End If
 
@@ -42,7 +45,7 @@ Public Class FileEntryNode
 
         ' We want just the name of the Directory, not the full path.
         ' So using GetFileName for this is just fine.
-        _nodes.Add(IoPath.GetFileName(path), node)
+        _nodes.Add((IoPath.GetFileName(path), True), node)
 
         Return node
     End Function
@@ -52,7 +55,7 @@ Public Class FileEntryNode
             Throw New ArgumentNullException(NameOf(path))
         End If
 
-        If IO.Path.GetDirectoryName(path) <> path Then
+        If IO.Path.GetDirectoryName(path) <> Me.Path Then
             Throw New ArgumentException($"Files's path does not match nodes's directory's path: {path}")
         End If
 
@@ -60,7 +63,7 @@ Public Class FileEntryNode
             path,
             isDirectory:=False) With {._parentNode = Me}
 
-        _nodes.Add(IO.Path.GetFileName(path), node)
+        _nodes.Add((IO.Path.GetFileName(path), False), node)
         UpdateCount()
         UpdateSize(length)
 
@@ -78,7 +81,10 @@ Public Class FileEntryNode
     End Sub
 
     Public Function TryGetNode(path As String, ByRef node As FileEntryNode) As Boolean
-        Return _nodes.TryGetValue(path, node)
+        Return If(
+            Not _nodes.TryGetValue((path, True), node), ' If we can't find the folder,
+            _nodes.TryGetValue((path, False), node),    ' maybe we can find a file with the same name,
+            False)                                      ' otherwise, we give up.
     End Function
 
     Public ReadOnly Property FileCount As Integer
@@ -99,7 +105,7 @@ Public Class FileEntryNode
         End Get
     End Property
 
-    Public ReadOnly Property Nodes As Dictionary(Of String, FileEntryNode)
+    Public ReadOnly Property Nodes As Dictionary(Of (name As String, isDirectory As Boolean), FileEntryNode)
         Get
             Return _nodes
         End Get
