@@ -46,7 +46,8 @@ Public Class FileEntryTree
             Throw New ArgumentException($"Root of 'path' does not match the root node's path: {path}")
         End If
 
-        Dim directoryName = IoPath.GetDirectoryName(path)
+        ' Special case root folder is drive (C:\).
+        Dim directoryName = If(path.Length = 3, path, IoPath.GetDirectoryName(path))
 
         If directoryName = _lastNodeAddedTo.Path Then
             Return _lastNodeAddedTo
@@ -56,11 +57,13 @@ Public Class FileEntryTree
             Return _lastNodeAdded
         End If
 
-        Dim remainingPathName = path.Substring(RootNode.Path.Length + 1)
+        ' Again, put special case root folder is drive into account.
+        Dim rootNodePathLength = RootNode.Path.Length
+        Dim remainingPathName = path.Substring(rootNodePathLength + If(rootNodePathLength = 3, 0, 1))
         Dim remainingPaths = remainingPathName.Split(IoPath.DirectorySeparatorChar)
         Dim searchNode = RootNode
         For i = 0 To remainingPaths.Length - 2
-            If (Not searchNode.TryGetNode(remainingPaths(i), searchNode)) Then
+            If Not searchNode.TryGetNode(remainingPaths(i), searchNode) Then
                 Throw New ArgumentException($"Couldn't find one of the ancestor nodes in the node structore: {path}")
             End If
         Next

@@ -69,8 +69,11 @@ Public Class FileCrawler
         RaiseEvent TopLevelDirectoriesAvailable(Me, New TopLevelDirectoriesAvailableEventArgs(RootNode))
 
         For Each fileEntry In topLevelEntries
+
+            If Not fileEntry.IsDirectory Then Continue For
+
             Dim subEntries = FileItemEnumerator.EnumerateEntriesRecursively(
-                _startPath,
+                fileEntry.Path,
                 FileAttributes.Hidden Or FileAttributes.System)
 
             For Each subEntry In subEntries

@@ -9,6 +9,8 @@
     End Sub
 
     Public Sub Queue(queue As IEnumerable(Of T))
+        If queue Is Nothing Then Return
+
         For Each item In queue
             _queue.Enqueue(item)
         Next

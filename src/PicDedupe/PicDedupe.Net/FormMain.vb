@@ -8,7 +8,8 @@ Public Class FormMain
     Private _lastUpdate As Long
     Private _lastItemCount As Integer
     Private WithEvents _timer As Timer
-    Private _itemsPerSecondCaculator As New ItemsPerSecondCalculator(50)
+    Private _itemsPerSecondCalculator As New ItemsPerSecondCalculator(200)
+    Private _lastUpdateTime As TimeSpan
 
     Private Const UpdateInterval As Integer = 50 ' Update Intervall in ms.
 
@@ -61,9 +62,14 @@ Public Class FormMain
         _stopWatch = Diagnostics.Stopwatch.StartNew
         _lastUpdate = _stopWatch.ElapsedMilliseconds
 
+        _fileCrawler = New FileCrawler(path)
+
+        If chkUseNetEnumerator.Checked Then
+            _fileCrawler.FileItemEnumerator = New LightningFastFileItemEnumerator()
+        End If
+
         Dim directoryTree = Await Task.Run(
             Function()
-                _fileCrawler = New FileCrawler(path)
 
                 AddHandler _fileCrawler.ProgressUpdate,
                     AddressOf FileCrawler_ProgressUpdate
@@ -82,9 +88,13 @@ Public Class FormMain
         TotalFileSize.Text = $"Total file size: {CType(directoryNode.Length, MemorySize)}"
         TotalFileCount.Text = $"Total file count: {directoryNode.FileCount:#,##0)}"
         ElapsedTime.Text = $"Elapsed time: {_stopWatch.Elapsed:hh\:mm\:ss}"
-        Dim itemsPerSecond = CInt(1000 / UpdateInterval * (directoryNode.FileCount - _lastItemCount))
-        _itemsPerSecondCaculator.AddElement(itemsPerSecond)
-        ItemsPerSecondProcessed.Text = $"Items per Second: {_itemsPerSecondCaculator.Avergage:#,##0}"
-        _lastItemCount = directoryNode.FileCount
+
+        If _stopWatch.Elapsed - _lastUpdateTime > New TimeSpan(0, 0, 0, 0, 200) Then
+            _lastUpdateTime = _stopWatch.Elapsed
+            Dim itemsPerSecond = 5 * (directoryNode.FileCount - _lastItemCount)
+            _itemsPerSecondCalculator.AddElement(itemsPerSecond)
+            ItemsPerSecondProcessed.Text = $"Items per Second: {_itemsPerSecondCalculator.Avergage:#,##0}"
+            _lastItemCount = directoryNode.FileCount
+        End If
     End Sub
 End Class

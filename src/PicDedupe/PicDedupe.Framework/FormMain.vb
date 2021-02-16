@@ -8,6 +8,8 @@ Public Class FormMain
     Private _lastUpdate As Long
     Private _lastItemCount As Integer
     Private WithEvents _timer As Timer
+    Private _itemsPerSecondCalculator As New ItemsPerSecondCalculator(200)
+    Private _lastUpdateTime As TimeSpan
 
     Private Const UpdateInterval As Integer = 50 ' Update Intervall in ms.
 
@@ -83,8 +85,13 @@ Public Class FormMain
         TotalFileSize.Text = $"Total file size: {CType(directoryNode.Length, MemorySize)}"
         TotalFileCount.Text = $"Total file count: {directoryNode.FileCount:#,##0)}"
         ElapsedTime.Text = $"Elapsed time: {_stopWatch.Elapsed:hh\:mm\:ss}"
-        Dim itemsPerSecond = 1000 / UpdateInterval * (directoryNode.FileCount - _lastItemCount)
-        ItemsPerSecondProcessed.Text = $"Items per Second: {itemsPerSecond:#,##0}"
-        _lastItemCount = directoryNode.FileCount
+
+        If _stopWatch.Elapsed - _lastUpdateTime > New TimeSpan(0, 0, 0, 0, 200) Then
+            _lastUpdateTime = _stopWatch.Elapsed
+            Dim itemsPerSecond = 5 * (directoryNode.FileCount - _lastItemCount)
+            _itemsPerSecondCalculator.AddElement(itemsPerSecond)
+            ItemsPerSecondProcessed.Text = $"Items per Second: {_itemsPerSecondCalculator.Avergage:#,##0}"
+            _lastItemCount = directoryNode.FileCount
+        End If
     End Sub
 End Class

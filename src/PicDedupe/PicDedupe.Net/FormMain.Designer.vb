@@ -22,6 +22,7 @@ Partial Class FormMain
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
+        Me.components = New System.ComponentModel.Container()
         Me.fileCrawlerPathPicker = New PicDedupe.Controls.PathPicker()
         Me.folderSplitter = New System.Windows.Forms.SplitContainer()
         Me.fileCrawlerFolderListView = New PicDedupe.Controls.FileSystemView()
@@ -29,8 +30,9 @@ Partial Class FormMain
         Me.TotalFileSize = New System.Windows.Forms.ToolStripStatusLabel()
         Me.TotalFileCount = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ElapsedTime = New System.Windows.Forms.ToolStripStatusLabel()
-        Me.CurrentTime = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ItemsPerSecondProcessed = New System.Windows.Forms.ToolStripStatusLabel()
+        Me.CurrentTime = New System.Windows.Forms.ToolStripStatusLabel()
+        Me.chkUseNetEnumerator = New System.Windows.Forms.CheckBox()
         CType(Me.folderSplitter, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.folderSplitter.Panel1.SuspendLayout()
         Me.folderSplitter.SuspendLayout()
@@ -43,9 +45,10 @@ Partial Class FormMain
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.fileCrawlerPathPicker.DialogTitel = Nothing
         Me.fileCrawlerPathPicker.Location = New System.Drawing.Point(6, 15)
+        Me.fileCrawlerPathPicker.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.fileCrawlerPathPicker.Name = "fileCrawlerPathPicker"
         Me.fileCrawlerPathPicker.Path = Nothing
-        Me.fileCrawlerPathPicker.Size = New System.Drawing.Size(1296, 47)
+        Me.fileCrawlerPathPicker.Size = New System.Drawing.Size(1033, 47)
         Me.fileCrawlerPathPicker.TabIndex = 1
         '
         'folderSplitter
@@ -93,41 +96,55 @@ Partial Class FormMain
         'TotalFileSize
         '
         Me.TotalFileSize.Name = "TotalFileSize"
-        Me.TotalFileSize.Size = New System.Drawing.Size(345, 25)
+        Me.TotalFileSize.Size = New System.Drawing.Size(259, 25)
         Me.TotalFileSize.Spring = True
         Me.TotalFileSize.Text = "Total file size: - - -"
         '
         'TotalFileCount
         '
         Me.TotalFileCount.Name = "TotalFileCount"
-        Me.TotalFileCount.Size = New System.Drawing.Size(345, 25)
+        Me.TotalFileCount.Size = New System.Drawing.Size(259, 25)
         Me.TotalFileCount.Spring = True
         Me.TotalFileCount.Text = "Total file count: - - -"
         '
         'ElapsedTime
         '
         Me.ElapsedTime.Name = "ElapsedTime"
-        Me.ElapsedTime.Size = New System.Drawing.Size(345, 25)
+        Me.ElapsedTime.Size = New System.Drawing.Size(259, 25)
         Me.ElapsedTime.Spring = True
         Me.ElapsedTime.Text = "Ellapsed Time: not started."
-        '
-        'CurrentTime
-        '
-        Me.CurrentTime.Name = "CurrentTime"
-        Me.CurrentTime.Size = New System.Drawing.Size(108, 25)
-        Me.CurrentTime.Text = "CurrentTime"
         '
         'ItemsPerSecondProcessed
         '
         Me.ItemsPerSecondProcessed.Name = "ItemsPerSecondProcessed"
-        Me.ItemsPerSecondProcessed.Size = New System.Drawing.Size(155, 25)
+        Me.ItemsPerSecondProcessed.Size = New System.Drawing.Size(259, 25)
+        Me.ItemsPerSecondProcessed.Spring = True
         Me.ItemsPerSecondProcessed.Text = "Items per Second:"
+        '
+        'CurrentTime
+        '
+        Me.CurrentTime.Name = "CurrentTime"
+        Me.CurrentTime.Size = New System.Drawing.Size(259, 25)
+        Me.CurrentTime.Spring = True
+        Me.CurrentTime.Text = "CurrentTime"
+        '
+        'chkUseNetEnumerator
+        '
+        Me.chkUseNetEnumerator.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.chkUseNetEnumerator.AutoSize = True
+        Me.chkUseNetEnumerator.Location = New System.Drawing.Point(1065, 25)
+        Me.chkUseNetEnumerator.Name = "chkUseNetEnumerator"
+        Me.chkUseNetEnumerator.Size = New System.Drawing.Size(232, 29)
+        Me.chkUseNetEnumerator.TabIndex = 4
+        Me.chkUseNetEnumerator.Text = "Use .NET file enumerator"
+        Me.chkUseNetEnumerator.UseVisualStyleBackColor = True
         '
         'FormMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(10.0!, 25.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1317, 813)
+        Me.Controls.Add(Me.chkUseNetEnumerator)
         Me.Controls.Add(Me.StatusStrip1)
         Me.Controls.Add(Me.folderSplitter)
         Me.Controls.Add(Me.fileCrawlerPathPicker)
@@ -153,4 +170,5 @@ Partial Class FormMain
     Friend WithEvents ElapsedTime As ToolStripStatusLabel
     Friend WithEvents CurrentTime As ToolStripStatusLabel
     Friend WithEvents ItemsPerSecondProcessed As ToolStripStatusLabel
+    Friend WithEvents chkUseNetEnumerator As CheckBox
 End Class

@@ -53,9 +53,7 @@ Public Class FileItemEnumerator
                 Catch ex As DirectoryNotFoundException
                 End Try
 
-                If newDirectories?.FirstOrDefault IsNot Nothing Then
-                    queue.Queue(newDirectories)
-                End If
+                queue.Queue(newDirectories)
             End Sub)
 
         Dim topLevelDirectory = New DirectoryInfo(rootPath)

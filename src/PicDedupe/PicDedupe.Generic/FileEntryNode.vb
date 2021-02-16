@@ -84,7 +84,7 @@ Public Class FileEntryNode
         Return If(
             Not _nodes.TryGetValue((path, True), node), ' If we can't find the folder,
             _nodes.TryGetValue((path, False), node),    ' maybe we can find a file with the same name,
-            False)                                      ' otherwise, we give up.
+            True)                                       ' otherwise, we found it in the first attempt, and return true.
     End Function
 
     Public ReadOnly Property FileCount As Integer
