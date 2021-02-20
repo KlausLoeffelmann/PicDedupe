@@ -6,13 +6,23 @@ Imports System.Security
 Public Class FileItemEnumerator
     Implements IFileItemEnumerator
 
-    Public Iterator Function EnumerateEntries(rootPath As String, Optional excludeAttributes As FileAttributes = 0) As IEnumerable(Of FileEntry) Implements IFileItemEnumerator.EnumerateEntries
+    Private Shared FileAttributeValues As FileAttributes() = [Enum].GetValues(GetType(FileAttributes)).Cast(Of FileAttributes).ToArray()
+
+    Public Iterator Function EnumerateEntries(
+        rootPath As String,
+        Optional excludeAttributes As FileAttributes = 0) As IEnumerable(Of FileEntry) Implements IFileItemEnumerator.EnumerateEntries
 
         Dim rootDirectory = New DirectoryInfo(rootPath)
 
+        ' We test each Bit of Attributes to check for again the Bits of each file.
+        Dim excludeAttributeFunction = New Func(Of FileSystemInfo, Boolean)(
+            Function(fileItem) (From enumValue In FileAttributeValues
+                                Where excludeAttributes.HasFlag(enumValue) AndAlso
+                                      fileItem.Attributes.HasFlag(enumValue)).FirstOrDefault > 0)
+
         'We first enumerate the directories...
         For Each fileEntry In rootDirectory.EnumerateDirectories().
-            Where(Function(fileItem) Not fileItem.Attributes.HasFlag(excludeAttributes))
+            Where(Function(fileItem) Not excludeAttributeFunction(fileItem))
 
             Yield New FileEntry(
                         fileEntry.FullName,
@@ -20,8 +30,8 @@ Public Class FileItemEnumerator
         Next
 
         '...and then the Files in that directory.
-        For Each fileEntry In rootDirectory.EnumerateFiles().
-                                    Where(Function(fileItem) Not fileItem.Attributes.HasFlag(excludeAttributes))
+        For Each fileEntry In rootDirectory.EnumerateFiles("*.*").
+            Where(Function(fileItem) Not excludeAttributeFunction(fileItem))
 
             Yield New FileEntry(
                         fileEntry.FullName,
@@ -36,6 +46,11 @@ Public Class FileItemEnumerator
 
         Dim queue As EnumerableQueue(Of DirectoryInfo) = Nothing
 
+        Dim excludeAttributeFunction = New Func(Of FileSystemInfo, Boolean)(
+            Function(fileItem) (From enumValue In FileAttributeValues
+                                Where excludeAttributes.HasFlag(enumValue) AndAlso
+                                      fileItem.Attributes.HasFlag(enumValue)).FirstOrDefault > 0)
+
         ' This is the delegate which gets called on dequeueing each item.
         ' It practically fills up the queue with the SubItems from that item.
         ' (If there are any).
@@ -46,7 +61,7 @@ Public Class FileItemEnumerator
                 Try
                     newDirectories = New DirectoryInfo(item.FullName).
                         EnumerateDirectories().
-                        Where(Function(dirItem) Not dirItem.Attributes.HasFlag(excludeAttributes))
+                            Where(Function(dirItem) Not excludeAttributeFunction(dirItem))
 
                     'We just swallow those.
                 Catch ex As SecurityException
@@ -79,8 +94,8 @@ Public Class FileItemEnumerator
                     subDirectory.FullName,
                     isDirectory:=True)
 
-            For Each fileEntry In subDirectory.EnumerateFiles().
-                    Where(Function(fileItem) Not fileItem.Attributes.HasFlag(excludeAttributes))
+            For Each fileEntry In subDirectory.EnumerateFiles("*.*").
+                Where(Function(fileItem) Not excludeAttributeFunction(fileItem))
 
                 Yield New FileEntry(
                         fileEntry.FullName,

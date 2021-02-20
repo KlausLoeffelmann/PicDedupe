@@ -9,7 +9,12 @@
 
     Public ReadOnly Property Path As String
 
-    Public Length As Long ' Can't be readonly, since the Length gets be accumulated while scanning folders.
+    Public Property Length As Long ' Can't be readonly, since the Length gets be accumulated while scanning folders.
 
     Public ReadOnly Property IsDirectory As Boolean
+
+    Public Overrides Function ToString() As String
+        'This is really useful for debugging purposes!
+        Return $"{If(IsDirectory, "D", "F")}: {Path} - {CType(Length, MemorySize)}"
+    End Function
 End Class

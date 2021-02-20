@@ -6,7 +6,7 @@ Public Class FileCrawler
     Public Event TopLevelDirectoriesAvailable(sender As Object, e As TopLevelDirectoriesAvailableEventArgs)
     Public Event ProgressUpdate(sender As Object, e As ProgressUpdateEventArgs)
 
-    Private Const AllFilesSearchPattern = "*.*"
+    Private Const DefaultFilesSearchPattern = "*.cs|*.vb|*.csproj|*.vbproj|*.sln|*.ico|*.bmp|*.png|*.jpg|*.gif"
 
     Private ReadOnly _startPath As String
     Private ReadOnly _searchPattern As String()
@@ -16,18 +16,23 @@ Public Class FileCrawler
 
     Public Sub New(
         startPath As String,
-        Optional searchPattern() As String = Nothing)
+        Optional searchPattern As String() = Nothing)
 
         If Not New DirectoryInfo(startPath).Exists Then
             Throw New DirectoryNotFoundException($"Directory {startPath} does not exist.")
         End If
 
-        searchPattern = If(searchPattern, New String() {".*"})
+        searchPattern = If(searchPattern, GetSearchPatternArray(DefaultFilesSearchPattern))
 
         _startPath = startPath
         _searchPattern = searchPattern
         _fileEntryTreeTree = New FileEntryTree(_startPath)
     End Sub
+
+    Private Function GetSearchPatternArray(searchPattern As String) As String()
+        Dim eliminatedAsterisks = searchPattern.Replace("*", "")
+        Return eliminatedAsterisks.Split("|"c)
+    End Function
 
     Public Function GetFiles() As FileEntryTree
 
@@ -40,7 +45,10 @@ Public Class FileCrawler
         If _searchPattern.Any(Function(searchPattern) searchPattern = ".*") Then
             entryFilter = Function(entry) True
         Else
-            entryFilter = Function(entry) _searchPattern.Any(Function(searchPattern) searchPattern = Path.GetExtension(entry.Path))
+            entryFilter = Function(entry) If(
+                entry.IsDirectory,
+                True,
+                _searchPattern.Any(Function(searchPattern) searchPattern = Path.GetExtension(entry.Path)))
         End If
 
         Dim topLevelDirectoriesAvailableFired = False
@@ -70,7 +78,9 @@ Public Class FileCrawler
 
         For Each fileEntry In topLevelEntries
 
-            If Not fileEntry.IsDirectory Then Continue For
+            If Not fileEntry.IsDirectory Then
+                Continue For
+            End If
 
             Dim subEntries = FileItemEnumerator.EnumerateEntriesRecursively(
                 fileEntry.Path,
@@ -78,7 +88,7 @@ Public Class FileCrawler
 
             For Each subEntry In subEntries
                 If Not entryFilter(fileEntry) Then Continue For
-                currentNode = _fileEntryTreeTree.AddEntry(subEntry)
+                _fileEntryTreeTree.AddEntry(subEntry)
                 RaiseEvent ProgressUpdate(Me, ProgressUpdateEventArgs.GetDefault(RootNode))
             Next
         Next

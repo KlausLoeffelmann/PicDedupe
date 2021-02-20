@@ -1,4 +1,4 @@
-﻿#If NETCOREAPP Then
+﻿#If NET5_0_OR_GREATER Then
 Imports System.IO
 Imports System.IO.Enumeration
 

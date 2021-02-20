@@ -61,6 +61,7 @@ Public Class FileEntryNode
 
         Dim node = New FileEntryNode(
             path,
+            length:=length,
             isDirectory:=False) With {._parentNode = Me}
 
         _nodes.Add((IO.Path.GetFileName(path), False), node)

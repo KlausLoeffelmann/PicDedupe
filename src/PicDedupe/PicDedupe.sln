@@ -11,6 +11,10 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "PicDedupe.Controls", "PicDe
 EndProject
 Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "PicDedupe.Generic", "PicDedupe.Generic\PicDedupe.Generic.vbproj", "{B532F17E-2CD0-46C9-9FBA-783009BB1FE0}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Apps", "Apps", "{80D566FE-2BD6-4609-B35A-4FC0343359B4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libs", "Libs", "{2D8ED176-D4EA-4565-975C-7B7C54BAD8E8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,6 +40,12 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{8F30E0F7-61DF-4FE0-BBD1-FB5AB63DED88} = {80D566FE-2BD6-4609-B35A-4FC0343359B4}
+		{271FC46B-0607-4453-9F14-6E9D336385E1} = {80D566FE-2BD6-4609-B35A-4FC0343359B4}
+		{8E9A8979-2E93-44C8-B918-C3084A3A704A} = {2D8ED176-D4EA-4565-975C-7B7C54BAD8E8}
+		{B532F17E-2CD0-46C9-9FBA-783009BB1FE0} = {2D8ED176-D4EA-4565-975C-7B7C54BAD8E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4516A06B-713E-4223-AD01-64EDABA618A3}

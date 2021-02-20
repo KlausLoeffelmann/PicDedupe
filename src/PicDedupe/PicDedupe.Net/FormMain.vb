@@ -39,12 +39,16 @@ Public Class FormMain
 
             Invoke(
             Sub()
-                For Each item In fileCrawlerFolderListView.Items
-                    DirectCast(item, FileSystemListViewItem).UpdateItem()
-                Next
+                UpdateListView()
                 UpdateStatusBar(e.NodeToUpdate)
             End Sub)
         End If
+    End Sub
+
+    Private Sub UpdateListView()
+        For Each item In fileCrawlerFolderListView.Items
+            DirectCast(item, FileSystemListViewItem).UpdateItem()
+        Next
     End Sub
 
     Private Sub FileCrawler_TopLevelDirectoriesAvailable(sender As Object, e As TopLevelDirectoriesAvailableEventArgs)
@@ -80,14 +84,15 @@ Public Class FormMain
                 Return _fileCrawler.GetFiles()
             End Function)
 
-        UpdateStatusBar(directoryTree.RootNode)
+        UpdateListView()
+        UpdateStatusBar(directoryTree.RootNode, isDone:=True)
 
     End Function
 
-    Private Sub UpdateStatusBar(directoryNode As FileEntryNode)
+    Private Sub UpdateStatusBar(directoryNode As FileEntryNode, Optional isDone As Boolean = False)
         TotalFileSize.Text = $"Total file size: {CType(directoryNode.Length, MemorySize)}"
         TotalFileCount.Text = $"Total file count: {directoryNode.FileCount:#,##0)}"
-        ElapsedTime.Text = $"Elapsed time: {_stopWatch.Elapsed:hh\:mm\:ss}"
+        ElapsedTime.Text = $"{If(isDone, "Done after: ", "Elapsed time: ")}{_stopWatch.Elapsed:hh\:mm\:ss}"
 
         If _stopWatch.Elapsed - _lastUpdateTime > New TimeSpan(0, 0, 0, 0, 200) Then
             _lastUpdateTime = _stopWatch.Elapsed
