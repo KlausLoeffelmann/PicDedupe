@@ -3,7 +3,7 @@ Imports IoPath = System.IO.Path
 
 Public Class FileEntryTree
 
-    Private _lastNodeAddedTo As FileEntryNode
+    Private ReadOnly _lastNodeAddedTo As FileEntryNode
     Private _lastNodeAdded As FileEntryNode
 
     Public Sub New(rootPath As String)

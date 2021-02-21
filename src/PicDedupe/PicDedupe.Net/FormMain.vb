@@ -1,17 +1,21 @@
-﻿Imports PicDedupe.Controls
+﻿Imports System.Text
+Imports PicDedupe.Controls
 Imports PicDedupe.Generic
 
 Public Class FormMain
 
+    Private Const UpdateInterval = 100
+
+    Private ReadOnly _itemsPerSecondCalculator As New ItemsPerSecondCalculator(200)
+
     Private WithEvents _fileCrawler As FileCrawler
+    Private WithEvents _doubletFinder As FileDoubletFinder
+    Private WithEvents _timer As Timer
+
     Private _stopWatch As Stopwatch
     Private _lastUpdate As Long
     Private _lastItemCount As Integer
-    Private WithEvents _timer As Timer
-    Private _itemsPerSecondCalculator As New ItemsPerSecondCalculator(200)
     Private _lastUpdateTime As TimeSpan
-
-    Private Const UpdateInterval As Integer = 50 ' Update Intervall in ms.
 
     Sub New()
 
@@ -24,17 +28,43 @@ Public Class FormMain
             .Enabled = True
         }
 
+        _doubletFinder = New FileDoubletFinder
+
         AddHandler _timer.Tick, Sub() CurrentTime.Text = $"Time: {Now.ToLongTimeString}"
+        AddHandler _doubletFinder.FileDoubletFound, AddressOf DoubletFinder_FileDoubletFound
+
+        AddHandler tsmCopyFilenameToClipboard.Click, AddressOf CopyFilenameToClipboard_Click
+        AddHandler tsmCreateCopyBatchInClipboard.Click, AddressOf CreateCopyBatchInClipboard_Click
     End Sub
 
-    Private Async Sub fileCrawlerPathPicker_PathChanged(sender As Object, e As PathChangedEventArgs) Handles fileCrawlerPathPicker.PathChanged
+    Private Sub CopyFilenameToClipboard_Click(sender As Object, e As EventArgs)
+    End Sub
+
+    Private Sub CreateCopyBatchInClipboard_Click(sender As Object, e As EventArgs)
+        Dim files = doubletsTreeView.GetDoublets
+        Dim stringBuilder = New StringBuilder
+        With stringBuilder
+            .AppendLine($"set ""DestPath=c:\temp\copytarget\""")
+            .AppendLine()
+            For Each fileItem In files
+                .AppendLine($"move ""{fileItem.Path}"" ""$DestPath%""")
+            Next
+        End With
+        Clipboard.SetText(stringBuilder.ToString)
+    End Sub
+
+    Private Async Sub FileCrawlerPathPicker_PathChanged(sender As Object, e As PathChangedEventArgs) Handles fileCrawlerPathPicker.PathChanged
         Await UpdatePathView(e.Path)
+    End Sub
+
+    Private Sub DoubletFinder_FileDoubletFound(sender As Object, e As FileDoubletFoundEventArgs)
+        Invoke(Sub() doubletsTreeView.AddDoublet(e.FileFound, e.DoubletList(0)))
     End Sub
 
     Private Sub FileCrawler_ProgressUpdate(sender As Object, e As ProgressUpdateEventArgs)
 
         'we'll visually update only every 100 ms.
-        If _lastUpdate + 50 < _stopWatch.ElapsedMilliseconds Then
+        If _lastUpdate + UpdateInterval < _stopWatch.ElapsedMilliseconds Then
             _lastUpdate = _stopWatch.ElapsedMilliseconds
 
             Invoke(
@@ -67,13 +97,14 @@ Public Class FormMain
         _lastUpdate = _stopWatch.ElapsedMilliseconds
 
         _fileCrawler = New FileCrawler(path)
+        _fileCrawler.DoubletFinder = _doubletFinder
 
         If chkUseNetEnumerator.Checked Then
             _fileCrawler.FileItemEnumerator = New LightningFastFileItemEnumerator()
         End If
 
         Dim directoryTree = Await Task.Run(
-            Function()
+            Async Function()
 
                 AddHandler _fileCrawler.ProgressUpdate,
                     AddressOf FileCrawler_ProgressUpdate
@@ -81,7 +112,7 @@ Public Class FormMain
                 AddHandler _fileCrawler.TopLevelDirectoriesAvailable,
                     AddressOf FileCrawler_TopLevelDirectoriesAvailable
 
-                Return _fileCrawler.GetFiles()
+                Return Await _fileCrawler.GetFilesAsync()
             End Function)
 
         UpdateListView()
@@ -95,8 +126,9 @@ Public Class FormMain
         ElapsedTime.Text = $"{If(isDone, "Done after: ", "Elapsed time: ")}{_stopWatch.Elapsed:hh\:mm\:ss}"
 
         If _stopWatch.Elapsed - _lastUpdateTime > New TimeSpan(0, 0, 0, 0, 200) Then
-            _lastUpdateTime = _stopWatch.Elapsed
             Dim itemsPerSecond = 5 * (directoryNode.FileCount - _lastItemCount)
+
+            _lastUpdateTime = _stopWatch.Elapsed
             _itemsPerSecondCalculator.AddElement(itemsPerSecond)
             ItemsPerSecondProcessed.Text = $"Items per Second: {_itemsPerSecondCalculator.Avergage:#,##0}"
             _lastItemCount = directoryNode.FileCount

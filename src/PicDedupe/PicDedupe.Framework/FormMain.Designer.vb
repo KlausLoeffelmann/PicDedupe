@@ -22,17 +22,20 @@ Partial Class FormMain
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
+        Me.components = New System.ComponentModel.Container()
         Me.folderSplitter = New System.Windows.Forms.SplitContainer()
         Me.fileCrawlerFolderListView = New PicDedupe.Controls.FileSystemView()
+        Me.doubletsTreeView = New PicDedupe.Controls.FileSystemTreeView()
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
         Me.TotalFileSize = New System.Windows.Forms.ToolStripStatusLabel()
         Me.TotalFileCount = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ElapsedTime = New System.Windows.Forms.ToolStripStatusLabel()
+        Me.ItemsPerSecondProcessed = New System.Windows.Forms.ToolStripStatusLabel()
         Me.CurrentTime = New System.Windows.Forms.ToolStripStatusLabel()
         Me.fileCrawlerPathPicker = New PicDedupe.Controls.PathPicker()
-        Me.ItemsPerSecondProcessed = New System.Windows.Forms.ToolStripStatusLabel()
         CType(Me.folderSplitter, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.folderSplitter.Panel1.SuspendLayout()
+        Me.folderSplitter.Panel2.SuspendLayout()
         Me.folderSplitter.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
         Me.SuspendLayout()
@@ -49,6 +52,10 @@ Partial Class FormMain
         'folderSplitter.Panel1
         '
         Me.folderSplitter.Panel1.Controls.Add(Me.fileCrawlerFolderListView)
+        '
+        'folderSplitter.Panel2
+        '
+        Me.folderSplitter.Panel2.Controls.Add(Me.doubletsTreeView)
         Me.folderSplitter.Size = New System.Drawing.Size(1198, 566)
         Me.folderSplitter.SplitterDistance = 355
         Me.folderSplitter.SplitterWidth = 3
@@ -66,6 +73,15 @@ Partial Class FormMain
         Me.fileCrawlerFolderListView.UseCompatibleStateImageBehavior = False
         Me.fileCrawlerFolderListView.View = System.Windows.Forms.View.Details
         '
+        'doubletsTreeView
+        '
+        Me.doubletsTreeView.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.doubletsTreeView.DrawMode = System.Windows.Forms.TreeViewDrawMode.OwnerDrawText
+        Me.doubletsTreeView.Location = New System.Drawing.Point(0, 0)
+        Me.doubletsTreeView.Name = "doubletsTreeView"
+        Me.doubletsTreeView.Size = New System.Drawing.Size(1198, 208)
+        Me.doubletsTreeView.TabIndex = 0
+        '
         'StatusStrip1
         '
         Me.StatusStrip1.ImageScalingSize = New System.Drawing.Size(20, 20)
@@ -80,23 +96,30 @@ Partial Class FormMain
         'TotalFileSize
         '
         Me.TotalFileSize.Name = "TotalFileSize"
-        Me.TotalFileSize.Size = New System.Drawing.Size(259, 25)
+        Me.TotalFileSize.Size = New System.Drawing.Size(271, 25)
         Me.TotalFileSize.Spring = True
         Me.TotalFileSize.Text = "Total file size: - - -"
         '
         'TotalFileCount
         '
         Me.TotalFileCount.Name = "TotalFileCount"
-        Me.TotalFileCount.Size = New System.Drawing.Size(259, 25)
+        Me.TotalFileCount.Size = New System.Drawing.Size(271, 25)
         Me.TotalFileCount.Spring = True
         Me.TotalFileCount.Text = "Total file count: - - -"
         '
         'ElapsedTime
         '
         Me.ElapsedTime.Name = "ElapsedTime"
-        Me.ElapsedTime.Size = New System.Drawing.Size(259, 25)
+        Me.ElapsedTime.Size = New System.Drawing.Size(271, 25)
         Me.ElapsedTime.Spring = True
         Me.ElapsedTime.Text = "Ellapsed Time: not started."
+        '
+        'ItemsPerSecondProcessed
+        '
+        Me.ItemsPerSecondProcessed.Name = "ItemsPerSecondProcessed"
+        Me.ItemsPerSecondProcessed.Size = New System.Drawing.Size(271, 25)
+        Me.ItemsPerSecondProcessed.Spring = True
+        Me.ItemsPerSecondProcessed.Text = "Items per sec:"
         '
         'CurrentTime
         '
@@ -115,13 +138,6 @@ Partial Class FormMain
         Me.fileCrawlerPathPicker.Size = New System.Drawing.Size(1196, 42)
         Me.fileCrawlerPathPicker.TabIndex = 1
         '
-        'ItemsPerSecondProcessed
-        '
-        Me.ItemsPerSecondProcessed.Name = "ItemsPerSecondProcessed"
-        Me.ItemsPerSecondProcessed.Size = New System.Drawing.Size(259, 25)
-        Me.ItemsPerSecondProcessed.Spring = True
-        Me.ItemsPerSecondProcessed.Text = "Items per sec:"
-        '
         'FormMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -133,6 +149,7 @@ Partial Class FormMain
         Me.Name = "FormMain"
         Me.Text = "PicDedupe"
         Me.folderSplitter.Panel1.ResumeLayout(False)
+        Me.folderSplitter.Panel2.ResumeLayout(False)
         CType(Me.folderSplitter, System.ComponentModel.ISupportInitialize).EndInit()
         Me.folderSplitter.ResumeLayout(False)
         Me.StatusStrip1.ResumeLayout(False)
@@ -151,4 +168,5 @@ Partial Class FormMain
     Friend WithEvents ElapsedTime As ToolStripStatusLabel
     Friend WithEvents CurrentTime As ToolStripStatusLabel
     Friend WithEvents ItemsPerSecondProcessed As ToolStripStatusLabel
+    Friend WithEvents doubletsTreeView As Controls.FileSystemTreeView
 End Class

@@ -3,7 +3,7 @@ Imports System.ComponentModel
 
 Public Class FileDoubletFinder
 
-    Private _files As Dictionary(Of Long, List(Of FileEntry))
+    Private ReadOnly _files As Dictionary(Of Long, List(Of FileEntry))
 
     Public Event FileDoubletFound(sender As Object, e As FileDoubletFoundEventArgs)
 
@@ -11,20 +11,37 @@ Public Class FileDoubletFinder
         _files = New Dictionary(Of Long, List(Of FileEntry))
     End Sub
 
-    Public Sub AddFile(file As FileEntry)
+    Public Async Function AddFileAsync(file As FileEntry) As Task
 
         Dim fileDoubletList As List(Of FileEntry) = Nothing
 
-        If _files.TryGetValue(file.Length, fileDoubletList) Then
+        If Not _files.TryGetValue(file.Length, fileDoubletList) Then
             fileDoubletList = If(fileDoubletList, New List(Of FileEntry)())
+            fileDoubletList.Add(file)
+            _files.Add(file.Length, fileDoubletList)
+            Return
+        End If
+
+        If file.Length < CompleteFileHashThreshold Then
+            Dim firstFileFoundHashTask = fileDoubletList(0).GetFileHashAsync
+            Dim currentFileFoundHashTask = file.GetFileHashAsync
+
+            Await Task.WhenAll(firstFileFoundHashTask, currentFileFoundHashTask)
+
+            If Not firstFileFoundHashTask.Result.SequenceEqual(currentFileFoundHashTask.Result) Then
+                Return
+            End If
         End If
 
         Dim eventArgs = New FileDoubletFoundEventArgs(file, fileDoubletList.ToImmutableList)
         RaiseEvent FileDoubletFound(Me, eventArgs)
+
         If Not eventArgs.Cancel Then
             fileDoubletList.Add(file)
         End If
-    End Sub
+    End Function
+
+    Public Property CompleteFileHashThreshold As Long = 10000000000000
 
 End Class
 

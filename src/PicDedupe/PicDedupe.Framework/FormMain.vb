@@ -3,15 +3,18 @@ Imports PicDedupe.Generic
 
 Public Class FormMain
 
+    Private Const UpdateInterval = 100
+
+    Private ReadOnly _itemsPerSecondCalculator As New ItemsPerSecondCalculator(200)
+
     Private WithEvents _fileCrawler As FileCrawler
+    Private WithEvents _doubletFinder As FileDoubletFinder
+    Private WithEvents _timer As Timer
+
     Private _stopWatch As Stopwatch
     Private _lastUpdate As Long
     Private _lastItemCount As Integer
-    Private WithEvents _timer As Timer
-    Private _itemsPerSecondCalculator As New ItemsPerSecondCalculator(200)
     Private _lastUpdateTime As TimeSpan
-
-    Private Const UpdateInterval As Integer = 50 ' Update Intervall in ms.
 
     Sub New()
 
@@ -24,19 +27,23 @@ Public Class FormMain
             .Enabled = True
         }
 
+        _doubletFinder = New FileDoubletFinder
+
+        AddHandler _timer.Tick, Sub() CurrentTime.Text = $"Time: {Now.ToLongTimeString}"
+        AddHandler _doubletFinder.FileDoubletFound, AddressOf DoubletFinder_FileDoubletFound
     End Sub
 
-    Private Async Sub fileCrawlerPathPicker_PathChanged(sender As Object, e As PathChangedEventArgs) Handles fileCrawlerPathPicker.PathChanged
+    Private Async Sub FileCrawlerPathPicker_PathChanged(sender As Object, e As PathChangedEventArgs) Handles fileCrawlerPathPicker.PathChanged
         Await UpdatePathView(e.Path)
     End Sub
 
-    Private Sub _timer_Tick(sender As Object, e As EventArgs) Handles _timer.Tick
-        CurrentTime.Text = Date.Now.ToShortTimeString
+    Private Sub DoubletFinder_FileDoubletFound(sender As Object, e As FileDoubletFoundEventArgs)
+        Invoke(Sub() doubletsTreeView.AddDoublet(e.FileFound, e.DoubletList(0)))
     End Sub
 
     Private Sub FileCrawler_ProgressUpdate(sender As Object, e As ProgressUpdateEventArgs)
 
-        'we'll visually update only every 50 ms.
+        'we'll visually update only every 100 ms.
         If _lastUpdate + UpdateInterval < _stopWatch.ElapsedMilliseconds Then
             _lastUpdate = _stopWatch.ElapsedMilliseconds
 
@@ -67,10 +74,13 @@ Public Class FormMain
     Private Async Function UpdatePathView(path As String) As Task
 
         _stopWatch = Diagnostics.Stopwatch.StartNew
+        _lastUpdate = _stopWatch.ElapsedMilliseconds
+
+        _fileCrawler = New FileCrawler(path)
+        _fileCrawler.DoubletFinder = _doubletFinder
 
         Dim directoryTree = Await Task.Run(
-            Function()
-                _fileCrawler = New FileCrawler(path)
+            Async Function()
 
                 AddHandler _fileCrawler.ProgressUpdate,
                     AddressOf FileCrawler_ProgressUpdate
@@ -78,7 +88,7 @@ Public Class FormMain
                 AddHandler _fileCrawler.TopLevelDirectoriesAvailable,
                     AddressOf FileCrawler_TopLevelDirectoriesAvailable
 
-                Return _fileCrawler.GetFiles()
+                Return Await _fileCrawler.GetFilesAsync()
             End Function)
 
         UpdateListView()
@@ -92,8 +102,9 @@ Public Class FormMain
         ElapsedTime.Text = $"{If(isDone, "Done after: ", "Elapsed time: ")}{_stopWatch.Elapsed:hh\:mm\:ss}"
 
         If _stopWatch.Elapsed - _lastUpdateTime > New TimeSpan(0, 0, 0, 0, 200) Then
-            _lastUpdateTime = _stopWatch.Elapsed
             Dim itemsPerSecond = 5 * (directoryNode.FileCount - _lastItemCount)
+
+            _lastUpdateTime = _stopWatch.Elapsed
             _itemsPerSecondCalculator.AddElement(itemsPerSecond)
             ItemsPerSecondProcessed.Text = $"Items per Second: {_itemsPerSecondCalculator.Avergage:#,##0}"
             _lastItemCount = directoryNode.FileCount

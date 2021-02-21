@@ -26,6 +26,7 @@ Partial Class FormMain
         Me.fileCrawlerPathPicker = New PicDedupe.Controls.PathPicker()
         Me.folderSplitter = New System.Windows.Forms.SplitContainer()
         Me.fileCrawlerFolderListView = New PicDedupe.Controls.FileSystemView()
+        Me.doubletsTreeView = New PicDedupe.Controls.FileSystemTreeView()
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
         Me.TotalFileSize = New System.Windows.Forms.ToolStripStatusLabel()
         Me.TotalFileCount = New System.Windows.Forms.ToolStripStatusLabel()
@@ -33,10 +34,16 @@ Partial Class FormMain
         Me.ItemsPerSecondProcessed = New System.Windows.Forms.ToolStripStatusLabel()
         Me.CurrentTime = New System.Windows.Forms.ToolStripStatusLabel()
         Me.chkUseNetEnumerator = New System.Windows.Forms.CheckBox()
+        Me.DoublettenContextMenu = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.tsmCopyFilenameToClipboard = New System.Windows.Forms.ToolStripMenuItem()
+        Me.tsmCreateDeleteBatchInClipboard = New System.Windows.Forms.ToolStripMenuItem()
+        Me.tsmCreateCopyBatchInClipboard = New System.Windows.Forms.ToolStripMenuItem()
         CType(Me.folderSplitter, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.folderSplitter.Panel1.SuspendLayout()
+        Me.folderSplitter.Panel2.SuspendLayout()
         Me.folderSplitter.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
+        Me.DoublettenContextMenu.SuspendLayout()
         Me.SuspendLayout()
         '
         'fileCrawlerPathPicker
@@ -64,9 +71,13 @@ Partial Class FormMain
         'folderSplitter.Panel1
         '
         Me.folderSplitter.Panel1.Controls.Add(Me.fileCrawlerFolderListView)
-        Me.folderSplitter.Size = New System.Drawing.Size(1296, 653)
-        Me.folderSplitter.SplitterDistance = 411
-        Me.folderSplitter.SplitterWidth = 5
+        '
+        'folderSplitter.Panel2
+        '
+        Me.folderSplitter.Panel2.Controls.Add(Me.doubletsTreeView)
+        Me.folderSplitter.Size = New System.Drawing.Size(1298, 667)
+        Me.folderSplitter.SplitterDistance = 418
+        Me.folderSplitter.SplitterWidth = 3
         Me.folderSplitter.TabIndex = 2
         '
         'fileCrawlerFolderListView
@@ -77,10 +88,20 @@ Partial Class FormMain
         Me.fileCrawlerFolderListView.Location = New System.Drawing.Point(0, 0)
         Me.fileCrawlerFolderListView.Margin = New System.Windows.Forms.Padding(4, 3, 4, 3)
         Me.fileCrawlerFolderListView.Name = "fileCrawlerFolderListView"
-        Me.fileCrawlerFolderListView.Size = New System.Drawing.Size(1296, 411)
+        Me.fileCrawlerFolderListView.Size = New System.Drawing.Size(1298, 418)
         Me.fileCrawlerFolderListView.TabIndex = 0
         Me.fileCrawlerFolderListView.UseCompatibleStateImageBehavior = False
         Me.fileCrawlerFolderListView.View = System.Windows.Forms.View.Details
+        '
+        'doubletsTreeView
+        '
+        Me.doubletsTreeView.ContextMenuStrip = Me.DoublettenContextMenu
+        Me.doubletsTreeView.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.doubletsTreeView.DrawMode = System.Windows.Forms.TreeViewDrawMode.OwnerDrawText
+        Me.doubletsTreeView.Location = New System.Drawing.Point(0, 0)
+        Me.doubletsTreeView.Name = "doubletsTreeView"
+        Me.doubletsTreeView.Size = New System.Drawing.Size(1298, 246)
+        Me.doubletsTreeView.TabIndex = 0
         '
         'StatusStrip1
         '
@@ -139,6 +160,31 @@ Partial Class FormMain
         Me.chkUseNetEnumerator.Text = "Use .NET file enumerator"
         Me.chkUseNetEnumerator.UseVisualStyleBackColor = True
         '
+        'DoublettenContextMenu
+        '
+        Me.DoublettenContextMenu.ImageScalingSize = New System.Drawing.Size(24, 24)
+        Me.DoublettenContextMenu.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tsmCopyFilenameToClipboard, Me.tsmCreateDeleteBatchInClipboard, Me.tsmCreateCopyBatchInClipboard})
+        Me.DoublettenContextMenu.Name = "DoublettenContextMenu"
+        Me.DoublettenContextMenu.Size = New System.Drawing.Size(428, 100)
+        '
+        'tsmCopyFilenameToClipboard
+        '
+        Me.tsmCopyFilenameToClipboard.Name = "tsmCopyFilenameToClipboard"
+        Me.tsmCopyFilenameToClipboard.Size = New System.Drawing.Size(427, 32)
+        Me.tsmCopyFilenameToClipboard.Text = "Copy Filename to Clipboard"
+        '
+        'tsmCreateDeleteBatchInClipboard
+        '
+        Me.tsmCreateDeleteBatchInClipboard.Name = "tsmCreateDeleteBatchInClipboard"
+        Me.tsmCreateDeleteBatchInClipboard.Size = New System.Drawing.Size(427, 32)
+        Me.tsmCreateDeleteBatchInClipboard.Text = "Create Delete Batchfile content in Clipboard"
+        '
+        'tsmCreateCopyBatchInClipboard
+        '
+        Me.tsmCreateCopyBatchInClipboard.Name = "tsmCreateCopyBatchInClipboard"
+        Me.tsmCreateCopyBatchInClipboard.Size = New System.Drawing.Size(427, 32)
+        Me.tsmCreateCopyBatchInClipboard.Text = "Create Copy Batchfile content in Clipboard"
+        '
         'FormMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(10.0!, 25.0!)
@@ -152,10 +198,12 @@ Partial Class FormMain
         Me.Name = "FormMain"
         Me.Text = "PicDedupe"
         Me.folderSplitter.Panel1.ResumeLayout(False)
+        Me.folderSplitter.Panel2.ResumeLayout(False)
         CType(Me.folderSplitter, System.ComponentModel.ISupportInitialize).EndInit()
         Me.folderSplitter.ResumeLayout(False)
         Me.StatusStrip1.ResumeLayout(False)
         Me.StatusStrip1.PerformLayout()
+        Me.DoublettenContextMenu.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -171,4 +219,9 @@ Partial Class FormMain
     Friend WithEvents CurrentTime As ToolStripStatusLabel
     Friend WithEvents ItemsPerSecondProcessed As ToolStripStatusLabel
     Friend WithEvents chkUseNetEnumerator As CheckBox
+    Friend WithEvents doubletsTreeView As Controls.FileSystemTreeView
+    Friend WithEvents DoublettenContextMenu As ContextMenuStrip
+    Friend WithEvents tsmCopyFilenameToClipboard As ToolStripMenuItem
+    Friend WithEvents tsmCreateDeleteBatchInClipboard As ToolStripMenuItem
+    Friend WithEvents tsmCreateCopyBatchInClipboard As ToolStripMenuItem
 End Class

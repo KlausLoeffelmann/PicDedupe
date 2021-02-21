@@ -6,13 +6,14 @@ Public Class FileCrawler
     Public Event TopLevelDirectoriesAvailable(sender As Object, e As TopLevelDirectoriesAvailableEventArgs)
     Public Event ProgressUpdate(sender As Object, e As ProgressUpdateEventArgs)
 
-    Private Const DefaultFilesSearchPattern = "*.cs|*.vb|*.csproj|*.vbproj|*.sln|*.ico|*.bmp|*.png|*.jpg|*.gif"
+    Private Const DefaultFilesSearchPattern = "*.cs|*.vb|*.csproj|*.vbproj|*.sln|*.ico|*.bmp|*.png|*.jpg|*.gif|*.resx|*.xml"
 
     Private ReadOnly _startPath As String
     Private ReadOnly _searchPattern As String()
 
-    Private _fileEntryTreeTree As FileEntryTree
+    Private _fileEntryTree As FileEntryTree
     Private _fileItemEnumerator As IFileItemEnumerator
+    Private WithEvents _doubletFinder As FileDoubletFinder
 
     Public Sub New(
         startPath As String,
@@ -26,7 +27,7 @@ Public Class FileCrawler
 
         _startPath = startPath
         _searchPattern = searchPattern
-        _fileEntryTreeTree = New FileEntryTree(_startPath)
+        _fileEntryTree = New FileEntryTree(_startPath)
     End Sub
 
     Private Function GetSearchPatternArray(searchPattern As String) As String()
@@ -34,21 +35,19 @@ Public Class FileCrawler
         Return eliminatedAsterisks.Split("|"c)
     End Function
 
-    Public Function GetFiles() As FileEntryTree
+    Public Async Function GetFilesAsync() As Task(Of FileEntryTree)
 
         Dim entryFilter As Func(Of FileEntry, Boolean)
-        Dim currentNode = _fileEntryTreeTree.RootNode
+        Dim currentNode = _fileEntryTree.RootNode
         Dim currentFile As String = Nothing
 
-        _fileEntryTreeTree = New FileEntryTree(_startPath)
+        _fileEntryTree = New FileEntryTree(_startPath)
 
         If _searchPattern.Any(Function(searchPattern) searchPattern = ".*") Then
             entryFilter = Function(entry) True
         Else
-            entryFilter = Function(entry) If(
-                entry.IsDirectory,
-                True,
-                _searchPattern.Any(Function(searchPattern) searchPattern = Path.GetExtension(entry.Path)))
+            entryFilter = Function(entry) entry.IsDirectory OrElse
+                                          _searchPattern.Any(Function(searchPattern) searchPattern = Path.GetExtension(entry.Path).ToLower)
         End If
 
         Dim topLevelDirectoriesAvailableFired = False
@@ -71,7 +70,8 @@ Public Class FileCrawler
 
         For Each fileEntry In topLevelEntries
             If Not entryFilter(fileEntry) Then Continue For
-            currentNode = _fileEntryTreeTree.AddEntry(fileEntry)
+            currentNode = _fileEntryTree.AddEntry(fileEntry)
+            If Not fileEntry.IsDirectory Then Await DoubletFinder.AddFileAsync(fileEntry)
         Next
 
         RaiseEvent TopLevelDirectoriesAvailable(Me, New TopLevelDirectoriesAvailableEventArgs(RootNode))
@@ -87,18 +87,21 @@ Public Class FileCrawler
                 FileAttributes.Hidden Or FileAttributes.System)
 
             For Each subEntry In subEntries
-                If Not entryFilter(fileEntry) Then Continue For
-                _fileEntryTreeTree.AddEntry(subEntry)
+                If Not entryFilter(subEntry) Then Continue For
+                _fileEntryTree.AddEntry(subEntry)
+
+                If Not subEntry.IsDirectory Then Await DoubletFinder.AddFileAsync(subEntry)
+
                 RaiseEvent ProgressUpdate(Me, ProgressUpdateEventArgs.GetDefault(RootNode))
             Next
         Next
 
-        Return _fileEntryTreeTree
+        Return _fileEntryTree
     End Function
 
     Public ReadOnly Property RootNode As FileEntryNode
         Get
-            Return _fileEntryTreeTree?.RootNode
+            Return _fileEntryTree?.RootNode
         End Get
     End Property
 
@@ -115,6 +118,21 @@ Public Class FileCrawler
                 Throw New ArgumentNullException(NameOf(value))
             End If
             _fileItemEnumerator = value
+        End Set
+    End Property
+
+    Public Property DoubletFinder As FileDoubletFinder
+        Get
+            If _doubletFinder Is Nothing Then
+                _doubletFinder = New FileDoubletFinder()
+            End If
+            Return _doubletFinder
+        End Get
+        Set(value As FileDoubletFinder)
+            If value Is Nothing Then
+                Throw New ArgumentNullException(NameOf(value))
+            End If
+            _doubletFinder = value
         End Set
     End Property
 End Class

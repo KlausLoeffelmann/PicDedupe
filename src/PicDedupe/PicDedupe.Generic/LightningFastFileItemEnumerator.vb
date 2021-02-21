@@ -20,7 +20,8 @@ Public Class LightningFastFileItemEnumerator
 
         Dim enumOptions = New EnumerationOptions() With {.RecurseSubdirectories = False}
 
-        Return EnumerateEntriesInternal(rootPath, enumOptions, excludeAttributes)
+        Return EnumerateEntriesInternal(rootPath, enumOptions, excludeAttributes).
+               OrderByDescending(Function(item) item.IsDirectory) ' It looks weird, if files appear in between folders in the listview.
     End Function
 
     Private Iterator Function EnumerateEntriesInternal(rootPath As String, enumOptions As EnumerationOptions, excludeAttributes As FileAttributes) As IEnumerable(Of FileEntry)

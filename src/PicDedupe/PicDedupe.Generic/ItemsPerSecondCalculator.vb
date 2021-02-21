@@ -1,6 +1,6 @@
 ﻿Public Class ItemsPerSecondCalculator
-    Private _elementQueue As New Queue(Of Integer)
-    Private _bufferCount As Integer
+    Private ReadOnly _elementQueue As New Queue(Of Integer)
+    Private ReadOnly _bufferCount As Integer
     Private _overAllSum As Long
     Private _overAllElementCount As Integer
 

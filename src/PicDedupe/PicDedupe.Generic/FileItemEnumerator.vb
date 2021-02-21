@@ -6,7 +6,7 @@ Imports System.Security
 Public Class FileItemEnumerator
     Implements IFileItemEnumerator
 
-    Private Shared FileAttributeValues As FileAttributes() = [Enum].GetValues(GetType(FileAttributes)).Cast(Of FileAttributes).ToArray()
+    Private Shared ReadOnly FileAttributeValues As FileAttributes() = [Enum].GetValues(GetType(FileAttributes)).Cast(Of FileAttributes).ToArray()
 
     Public Iterator Function EnumerateEntries(
         rootPath As String,
@@ -84,6 +84,17 @@ Public Class FileItemEnumerator
         'immediately, while the crawling of the folders is still
         'happening. (Does have _nothing_ to do with parallelization, btw.)
         queue = New EnumerableQueue(Of DirectoryInfo)(getSubFolder)
+
+        ' We need to process the files of the top directory individually,
+        ' since the top directory must not become part of the queue.
+        For Each fileEntry In topLevelDirectory.EnumerateFiles("*.*").
+                Where(Function(fileItem) Not excludeAttributeFunction(fileItem))
+
+            Yield New FileEntry(
+                        fileEntry.FullName,
+                        isDirectory:=False,
+                        length:=fileEntry.Length)
+        Next
 
         'And then getting their subfolders, which also get queued.
         getSubFolder(topLevelDirectory)
