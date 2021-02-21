@@ -41,7 +41,7 @@ Public Class FileDoubletFinder
         End If
     End Function
 
-    Public Property CompleteFileHashThreshold As Long = 10000000000000
+    Public Property CompleteFileHashThreshold As Long = 10000000
 
 End Class
 

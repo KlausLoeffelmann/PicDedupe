@@ -135,7 +135,7 @@ Partial Class FormMain
         Me.fileCrawlerPathPicker.Location = New System.Drawing.Point(6, 12)
         Me.fileCrawlerPathPicker.Name = "fileCrawlerPathPicker"
         Me.fileCrawlerPathPicker.Path = Nothing
-        Me.fileCrawlerPathPicker.Size = New System.Drawing.Size(1196, 42)
+        Me.fileCrawlerPathPicker.Size = New System.Drawing.Size(1198, 42)
         Me.fileCrawlerPathPicker.TabIndex = 1
         '
         'FormMain
