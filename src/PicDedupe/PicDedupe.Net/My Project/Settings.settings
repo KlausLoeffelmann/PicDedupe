@@ -6,7 +6,7 @@
       <Value Profile="(Default)">Test</Value>
     </Setting>
     <Setting Name="Test2Value" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">1234</Value>
     </Setting>
   </Settings>
 </SettingsFile>
