@@ -1,5 +1,6 @@
 ﻿#If NET5_0_OR_GREATER Then
 Imports System.Drawing.Imaging
+Imports System.IO
 Imports System.Runtime.InteropServices
 Imports PicDedupe.Generic
 
@@ -13,120 +14,127 @@ Imports Windows.Storage.Streams
 
 Friend Class ImageLoader
 
-	Private Shared ReadOnly s_parallelOptions As ParallelOptions
+    Private Shared ReadOnly s_parallelOptions As ParallelOptions
 
-	Shared Sub New()
+    Shared Sub New()
 
-		Dim maxDegreeOfParallelism As Integer
+        Dim maxDegreeOfParallelism As Integer
 
-		Select Case Environment.ProcessorCount
-			Case 1, 2
-				maxDegreeOfParallelism = 1
-			Case 3, 4
-				maxDegreeOfParallelism = 2
-			Case 4 To 8
-				maxDegreeOfParallelism = Environment.ProcessorCount \ 2
-			Case 8 To 32
-				maxDegreeOfParallelism = Environment.ProcessorCount \ 4
-			Case > 32
-				maxDegreeOfParallelism = 10
-			Case Else
-				Throw New Exception("This machine doesn't seem to have a processor.")
-				Exit Select
-		End Select
-	End Sub
+        Select Case Environment.ProcessorCount
+            Case 1, 2
+                maxDegreeOfParallelism = 1
+            Case 3, 4
+                maxDegreeOfParallelism = 2
+            Case 4 To 8
+                maxDegreeOfParallelism = Environment.ProcessorCount \ 2
+            Case 8 To 32
+                maxDegreeOfParallelism = Environment.ProcessorCount \ 4
+            Case > 32
+                maxDegreeOfParallelism = 10
+            Case Else
+                Throw New Exception("This machine doesn't seem to have a processor.")
+                Exit Select
+        End Select
+    End Sub
 
-	Public Async Function LoadThumbnailAsync(ByVal imageFile As FileEntry) As Task(Of Bitmap)
-		Dim storageItemThumbnailStream As IRandomAccessStream
-		Dim file As StorageFile = Await StorageFile.GetFileFromPathAsync(imageFile.Path)
+    Public Shared Async Function LoadThumbnailAsync(ByVal imageFile As FileEntry) As Task(Of Bitmap)
+        Dim storageItemThumbnailStream As IRandomAccessStream
+        Dim file As StorageFile = Await StorageFile.GetFileFromPathAsync(imageFile.Path)
 
-		Try
-			Dim storageItemThumbnail = Await file.GetThumbnailAsync(ThumbnailMode.ListView, 128)
+        Try
+            Dim storageItemThumbnail = Await file.GetThumbnailAsync(ThumbnailMode.ListView, 128)
 
-			storageItemThumbnailStream = If(
-				storageItemThumbnail Is Nothing,
-				Await file.OpenAsync(FileAccessMode.Read),
-				storageItemThumbnail.CloneStream())
-		Catch e1 As Exception
-			Throw
-		End Try
+            storageItemThumbnailStream = If(
+                storageItemThumbnail Is Nothing,
+                Await file.OpenAsync(FileAccessMode.Read),
+                storageItemThumbnail.CloneStream())
+        Catch e1 As Exception
+            Throw
+        End Try
 
-		Dim bitmap As Bitmap = Await GetWinformsBitmapAsync(storageItemThumbnailStream, New Size(128, 128))
-		Return bitmap
-	End Function
+        Dim bitmap As Bitmap = Await GetWinFormsBitmapAsync(storageItemThumbnailStream, New Size(128, 128))
+        Return bitmap
+    End Function
 
-	Public Async Function LoadBitmapAsync(ByVal imageFile As FileEntry, Optional ByVal scaleAndCropSize? As Size = Nothing) As Task(Of Bitmap)
-		Dim file As StorageFile = Await StorageFile.GetFileFromPathAsync(imageFile.Path)
-		'var imageProperties = await file.Properties.GetImagePropertiesAsync();
+    Public Shared Async Function LoadImageAsync(
+        ByVal imageFile As FileInfo,
+        Optional ByVal scaleAndCropSize? As Size = Nothing) As Task(Of (image As Image, exception As Exception))
 
-		Using stream = Await file.OpenAsync(FileAccessMode.Read)
-			Dim bitmap As Bitmap = Await GetWinformsBitmapAsync(stream, scaleAndCropSize)
-			Return bitmap
-		End Using
+        Dim file As StorageFile = Await StorageFile.GetFileFromPathAsync(imageFile.FullName)
+        'var imageProperties = await file.Properties.GetImagePropertiesAsync();
 
-	End Function
+        Using stream = Await file.OpenAsync(FileAccessMode.Read)
+            Try
+                Dim bitmap As Bitmap = Await GetWinFormsBitmapAsync(stream, scaleAndCropSize)
+                Return (bitmap, Nothing)
+            Catch ex As Exception
+                Return (Nothing, ex)
+            End Try
+        End Using
 
-	Private Async Function GetWinFormsBitmapAsync(ByVal stream As IRandomAccessStream, Optional ByVal scaleAndCropSize? As Size = Nothing) As Task(Of Bitmap)
-		Dim decoder As BitmapDecoder = Await BitmapDecoder.CreateAsync(stream)
+    End Function
 
-		Dim bitmapTransform = New BitmapTransform()
+    Private Shared Async Function GetWinFormsBitmapAsync(ByVal stream As IRandomAccessStream, Optional ByVal scaleAndCropSize? As Size = Nothing) As Task(Of Bitmap)
+        Dim decoder As BitmapDecoder = Await BitmapDecoder.CreateAsync(stream)
 
-		Dim scaleWidth As Double = decoder.OrientedPixelWidth
-		Dim scaleHeight As Double = decoder.OrientedPixelHeight
+        Dim bitmapTransform = New BitmapTransform()
 
-		If scaleAndCropSize IsNot Nothing Then
-			Dim scale As Double
+        Dim scaleWidth As Double = decoder.OrientedPixelWidth
+        Dim scaleHeight As Double = decoder.OrientedPixelHeight
 
-			Dim destRatio = scaleAndCropSize.Value.Width \ scaleAndCropSize.Value.Height
-			scale = CDbl(scaleAndCropSize.Value.Width) / decoder.OrientedPixelWidth
+        If scaleAndCropSize IsNot Nothing Then
+            Dim scale As Double
 
-			scaleWidth = decoder.OrientedPixelWidth * scale
-			scaleHeight = decoder.OrientedPixelHeight * scale
-			bitmapTransform.ScaledWidth = CUInt(scaleWidth)
-			bitmapTransform.ScaledHeight = CUInt(scaleHeight)
-		End If
+            Dim destRatio = scaleAndCropSize.Value.Width \ scaleAndCropSize.Value.Height
+            scale = CDbl(scaleAndCropSize.Value.Width) / decoder.OrientedPixelWidth
 
-		If decoder.OrientedPixelWidth <> decoder.PixelWidth Then
-			bitmapTransform.Rotation = BitmapRotation.Clockwise270Degrees
-			Dim scaleHeightTemp = bitmapTransform.ScaledHeight
-			bitmapTransform.ScaledHeight = bitmapTransform.ScaledWidth
-			bitmapTransform.ScaledWidth = scaleHeightTemp
-		End If
+            scaleWidth = decoder.OrientedPixelWidth * scale
+            scaleHeight = decoder.OrientedPixelHeight * scale
+            bitmapTransform.ScaledWidth = CUInt(scaleWidth)
+            bitmapTransform.ScaledHeight = CUInt(scaleHeight)
+        End If
 
-		Dim bitmap = New Bitmap(CInt(Fix(scaleWidth)), CInt(Fix(scaleHeight)), System.Drawing.Imaging.PixelFormat.Format32bppArgb)
+        If decoder.OrientedPixelWidth <> decoder.PixelWidth Then
+            bitmapTransform.Rotation = BitmapRotation.Clockwise270Degrees
+            Dim scaleHeightTemp = bitmapTransform.ScaledHeight
+            bitmapTransform.ScaledHeight = bitmapTransform.ScaledWidth
+            bitmapTransform.ScaledWidth = scaleHeightTemp
+        End If
 
-		Dim bmpdata = bitmap.LockBits(New Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, bitmap.PixelFormat)
-		Dim numbytes As Integer = bmpdata.Stride * bitmap.Height
-		bitmap.UnlockBits(bmpdata)
+        Dim bitmap = New Bitmap(CInt(Fix(scaleWidth)), CInt(Fix(scaleHeight)), System.Drawing.Imaging.PixelFormat.Format32bppArgb)
 
-		Dim pixelData = Await decoder.GetPixelDataAsync(
-			BitmapPixelFormat.Rgba8,
-			BitmapAlphaMode.Straight,
-			bitmapTransform,
-			ExifOrientationMode.IgnoreExifOrientation,
-			ColorManagementMode.DoNotColorManage)
+        Dim bmpdata = bitmap.LockBits(New Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, bitmap.PixelFormat)
+        Dim numbytes As Integer = bmpdata.Stride * bitmap.Height
+        bitmap.UnlockBits(bmpdata)
 
-		Dim bitmapBytes = pixelData.DetachPixelData()
-		Dim stride = (((CInt(Fix(scaleWidth)) * 32) + 31) And (Not 31)) >> 3
+        Dim pixelData = Await decoder.GetPixelDataAsync(
+            BitmapPixelFormat.Rgba8,
+            BitmapAlphaMode.Straight,
+            bitmapTransform,
+            ExifOrientationMode.IgnoreExifOrientation,
+            ColorManagementMode.DoNotColorManage)
 
-		Debug.Print($"Allocated: {bitmapBytes.Length / 1024:#,###} KiloBytes for Graphic calculation.")
+        Dim bitmapBytes = pixelData.DetachPixelData()
+        Dim stride = (((CInt(Fix(scaleWidth)) * 32) + 31) And (Not 31)) >> 3
 
-		Dim bitmapData As BitmapData = bitmap.LockBits(
-			New Rectangle(0, 0, bitmap.Width, bitmap.Height),
-			ImageLockMode.ReadWrite, bitmap.PixelFormat)
+        Debug.Print($"Allocated: {bitmapBytes.Length / 1024:#,###} KiloBytes for Graphic calculation.")
 
-		' We need to reorgenize the Byte-Pattern.            
-		Parallel.For(0, bitmapBytes.Length \ 4, s_parallelOptions,
-					 Sub(i) ' * 4
-						 Dim parallelForIndex = i << &B10
-						 Dim byteTemp = bitmapBytes(parallelForIndex + 0)
-						 bitmapBytes(parallelForIndex + 0) = bitmapBytes(parallelForIndex + 2)
-						 bitmapBytes(parallelForIndex + 2) = byteTemp
-					 End Sub)
+        Dim bitmapData As BitmapData = bitmap.LockBits(
+            New Rectangle(0, 0, bitmap.Width, bitmap.Height),
+            ImageLockMode.ReadWrite, bitmap.PixelFormat)
 
-		Marshal.Copy(bitmapBytes, 0, bitmapData.Scan0, bitmapBytes.Length)
-		bitmap.UnlockBits(bitmapData)
-		Return bitmap
-	End Function
+        ' We need to reorgenize the Byte-Pattern.            
+        Parallel.For(0, bitmapBytes.Length \ 4, s_parallelOptions,
+                     Sub(i) ' * 4
+                         Dim parallelForIndex = i << &B10
+                         Dim byteTemp = bitmapBytes(parallelForIndex + 0)
+                         bitmapBytes(parallelForIndex + 0) = bitmapBytes(parallelForIndex + 2)
+                         bitmapBytes(parallelForIndex + 2) = byteTemp
+                     End Sub)
+
+        Marshal.Copy(bitmapBytes, 0, bitmapData.Scan0, bitmapBytes.Length)
+        bitmap.UnlockBits(bitmapData)
+        Return bitmap
+    End Function
 End Class
 #End If

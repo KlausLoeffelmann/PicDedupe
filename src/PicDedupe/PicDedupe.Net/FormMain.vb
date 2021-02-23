@@ -32,25 +32,6 @@ Public Class FormMain
 
         AddHandler _timer.Tick, Sub() CurrentTime.Text = $"Time: {Now.ToLongTimeString}"
         AddHandler _doubletFinder.FileDoubletFound, AddressOf DoubletFinder_FileDoubletFound
-
-        AddHandler tsmCopyFilenameToClipboard.Click, AddressOf CopyFilenameToClipboard_Click
-        AddHandler tsmCreateCopyBatchInClipboard.Click, AddressOf CreateCopyBatchInClipboard_Click
-    End Sub
-
-    Private Sub CopyFilenameToClipboard_Click(sender As Object, e As EventArgs)
-    End Sub
-
-    Private Sub CreateCopyBatchInClipboard_Click(sender As Object, e As EventArgs)
-        Dim files = doubletsTreeView.GetDoublets
-        Dim stringBuilder = New StringBuilder
-        With stringBuilder
-            .AppendLine($"set ""DestPath=c:\temp\copytarget\""")
-            .AppendLine()
-            For Each fileItem In files
-                .AppendLine($"move ""{fileItem.Path}"" ""$DestPath%""")
-            Next
-        End With
-        Clipboard.SetText(stringBuilder.ToString)
     End Sub
 
     Private Async Sub FileCrawlerPathPicker_PathChanged(sender As Object, e As PathChangedEventArgs) Handles fileCrawlerPathPicker.PathChanged
@@ -77,7 +58,7 @@ Public Class FormMain
 
     Private Sub UpdateListView()
         For Each item In fileCrawlerFolderListView.Items
-            DirectCast(item, FileSystemListViewItem).UpdateItem()
+            DirectCast(item, FileEntryListViewItem).UpdateItem()
         Next
     End Sub
 
@@ -85,7 +66,7 @@ Public Class FormMain
         Invoke(
             Sub()
                 For Each item In e.RootNode.Nodes
-                    Me.fileCrawlerFolderListView.Items.Add(New FileSystemListViewItem(item.Value))
+                    Me.fileCrawlerFolderListView.Items.Add(New FileEntryListViewItem(item.Value))
                 Next
                 UpdateStatusBar(_fileCrawler.RootNode)
             End Sub)
@@ -133,5 +114,9 @@ Public Class FormMain
             ItemsPerSecondProcessed.Text = $"Items per Second: {_itemsPerSecondCalculator.Avergage:#,##0}"
             _lastItemCount = directoryNode.FileCount
         End If
+    End Sub
+
+    Private Sub doubletsTreeView_NodeMouseDoubleClick(sender As Object, e As TreeNodeMouseClickEventArgs) Handles doubletsTreeView.NodeMouseDoubleClick
+        PictureViewerForm.ShowPicture(New IO.FileInfo(DirectCast(e.Node, FileEntryTreeViewNode).FileEntry.Path))
     End Sub
 End Class

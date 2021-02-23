@@ -24,8 +24,8 @@ Partial Class FormMain
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Me.folderSplitter = New System.Windows.Forms.SplitContainer()
-        Me.fileCrawlerFolderListView = New PicDedupe.Controls.FileSystemView()
-        Me.doubletsTreeView = New PicDedupe.Controls.FileSystemTreeView()
+        Me.fileCrawlerFolderListView = New PicDedupe.Controls.FileEntryView()
+        Me.doubletsTreeView = New PicDedupe.Controls.FileEntryTreeView()
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
         Me.TotalFileSize = New System.Windows.Forms.ToolStripStatusLabel()
         Me.TotalFileCount = New System.Windows.Forms.ToolStripStatusLabel()
@@ -161,12 +161,12 @@ Partial Class FormMain
 
     Friend WithEvents fileCrawlerPathPicker As PicDedupe.Controls.PathPicker
     Friend WithEvents folderSplitter As SplitContainer
-    Friend WithEvents fileCrawlerFolderListView As PicDedupe.Controls.FileSystemView
+    Friend WithEvents fileCrawlerFolderListView As PicDedupe.Controls.FileEntryView
     Friend WithEvents StatusStrip1 As StatusStrip
     Friend WithEvents TotalFileSize As ToolStripStatusLabel
     Friend WithEvents TotalFileCount As ToolStripStatusLabel
     Friend WithEvents ElapsedTime As ToolStripStatusLabel
     Friend WithEvents CurrentTime As ToolStripStatusLabel
     Friend WithEvents ItemsPerSecondProcessed As ToolStripStatusLabel
-    Friend WithEvents doubletsTreeView As Controls.FileSystemTreeView
+    Friend WithEvents doubletsTreeView As Controls.FileEntryTreeView
 End Class

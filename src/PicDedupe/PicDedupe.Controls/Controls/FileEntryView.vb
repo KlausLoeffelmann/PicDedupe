@@ -1,12 +1,12 @@
 ﻿Imports System.IO
 Imports System.Windows.Forms
 
-Public Class FileSystemView
+Public Class FileEntryView
     Inherits ListView
 
     Private _imageList As ImageList = New ImageList
 
-    Public Event FolderListViewItemDoubleClick(sender As Object, e As FolderListViewItemDoubleClickEventArgs)
+    Public Event FolderListViewItemDoubleClick(sender As Object, e As FileEntryListViewItemDoubleClickEventArgs)
 
     Public Sub New()
         DoubleBuffered = True
@@ -34,8 +34,8 @@ Public Class FileSystemView
         If hitTestInfo IsNot Nothing Then
             RaiseEvent FolderListViewItemDoubleClick(
                 Me,
-                New FolderListViewItemDoubleClickEventArgs(
-                    DirectCast(hitTestInfo.Item, FileSystemListViewItem)))
+                New FileEntryListViewItemDoubleClickEventArgs(
+                    DirectCast(hitTestInfo.Item, FileEntryListViewItem)))
         End If
     End Sub
 End Class

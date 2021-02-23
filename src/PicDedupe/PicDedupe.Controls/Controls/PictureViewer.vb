@@ -1,6 +1,18 @@
-﻿Imports PicDedupe.Generic
+﻿Imports System.IO
 
 Public Class PictureViewer
+
+    Private _lastException As Exception
+
+    Public Async Function LoadImageAsync(fileInfo As FileInfo) As Task
+        Dim imageAndException = Await ImageLoader.LoadImageAsync(fileInfo)
+        If imageAndException.exception IsNot Nothing Then
+            pictureBox.Image = Nothing
+            _lastException = imageAndException.exception
+        Else
+            pictureBox.Image = imageAndException.image
+        End If
+    End Function
 
     Protected Overrides Sub OnLayout(e As LayoutEventArgs)
         MyBase.OnLayout(e)
@@ -29,16 +41,9 @@ Public Class PictureViewer
         End With
     End Sub
 
-#If NET5_0_OR_GREATER Then
-    Private Class ImageLoader
-        Public Function GetSupportedImageFormats() As String()
-
-        End Function
-
-        Public Function LoadImage(filename As FileEntry) As Bitmap
-
-        End Function
-    End Class
-#End If
-
+    Public ReadOnly Property LastException As Exception
+        Get
+            Return _lastException
+        End Get
+    End Property
 End Class

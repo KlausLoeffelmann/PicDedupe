@@ -57,7 +57,7 @@ Public Class FormMain
 
     Private Sub UpdateListView()
         For Each item In fileCrawlerFolderListView.Items
-            DirectCast(item, FileSystemListViewItem).UpdateItem()
+            DirectCast(item, FileEntryListViewItem).UpdateItem()
         Next
     End Sub
 
@@ -65,7 +65,7 @@ Public Class FormMain
         Invoke(
             Sub()
                 For Each item In e.RootNode.Nodes
-                    Me.fileCrawlerFolderListView.Items.Add(New FileSystemListViewItem(item.Value))
+                    Me.fileCrawlerFolderListView.Items.Add(New FileEntryListViewItem(item.Value))
                 Next
                 UpdateStatusBar(_fileCrawler.RootNode)
             End Sub)

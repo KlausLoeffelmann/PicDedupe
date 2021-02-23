@@ -28,19 +28,22 @@ Partial Class PictureViewer
         '
         'pictureBox
         '
-        Me.pictureBox.Location = New System.Drawing.Point(13, 12)
+        Me.pictureBox.Location = New System.Drawing.Point(12, 10)
+        Me.pictureBox.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
         Me.pictureBox.Name = "pictureBox"
-        Me.pictureBox.Size = New System.Drawing.Size(638, 380)
+        Me.pictureBox.Size = New System.Drawing.Size(567, 304)
         Me.pictureBox.TabIndex = 0
         Me.pictureBox.TabStop = False
         '
         'PictureViewer
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.AutoScroll = True
         Me.Controls.Add(Me.pictureBox)
+        Me.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
         Me.Name = "PictureViewer"
-        Me.Size = New System.Drawing.Size(824, 619)
+        Me.Size = New System.Drawing.Size(732, 495)
         CType(Me.pictureBox, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 

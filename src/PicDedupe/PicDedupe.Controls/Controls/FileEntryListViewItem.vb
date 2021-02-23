@@ -1,6 +1,6 @@
 ﻿Imports PicDedupe.Generic
 
-Public Class FileSystemListViewItem
+Public Class FileEntryListViewItem
     Inherits ListViewItem
 
     Private Shared s_fileCountFormatStrings As (valueFormat As String, nullFormat As String) =

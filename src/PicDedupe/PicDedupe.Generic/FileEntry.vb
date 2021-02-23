@@ -19,7 +19,9 @@ Public Class FileEntry
 
     Public ReadOnly Property IsDirectory As Boolean
 
-    Public Async Function GetFileHashAsync() As Task(Of Byte())
+    Public Async Function GetFileHashAsync() _
+        As Task(Of Byte())
+
 #If NET5_0_OR_GREATER Then
         If _fileHash Is Nothing Then
             Dim sha256Calc = SHA256.Create()
