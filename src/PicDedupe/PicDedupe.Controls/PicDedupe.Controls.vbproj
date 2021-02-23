@@ -1,27 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-	<!--<TargetFrameworks>net4.8;net5.0-windows</TargetFrameworks>-->
-	<TargetFrameworks>net4.8;net5.0-windows10.0.19041.0</TargetFrameworks>
-    <RootNamespace>PicDedupe.Controls</RootNamespace>
-    <UseWindowsForms>true</UseWindowsForms>
-    <MyType>WindowsForms</MyType>
-    <OptionStrict>On</OptionStrict>
-  </PropertyGroup>
+	<PropertyGroup>
+		<!--<TargetFrameworks>net4.8;net5.0-windows</TargetFrameworks>-->
+		<TargetFrameworks>net4.8;net5.0-windows10.0.19041.0</TargetFrameworks>
+		<RootNamespace>PicDedupe.Controls</RootNamespace>
+		<UseWindowsForms>true</UseWindowsForms>
+		<MyType>WindowsForms</MyType>
+		<OptionStrict>On</OptionStrict>
+	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
+	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
-    <RemoveIntegerChecks>false</RemoveIntegerChecks>
-    <Prefer32Bit>true</Prefer32Bit>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="My Project\AssemblyInfo.vb" />
-  </ItemGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
+		<RemoveIntegerChecks>false</RemoveIntegerChecks>
+		<Prefer32Bit>true</Prefer32Bit>
+	</PropertyGroup>
 
   <ItemGroup>
     <Import Include="System.Data" />
@@ -34,12 +30,22 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="My Project\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-    </None>
+	  <Compile Update="My Project\Settings.Designer.vb">
+		  <DesignTimeSharedInput>True</DesignTimeSharedInput>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>Settings.settings</DependentUpon>
+	  </Compile>
   </ItemGroup>
 
-  <ItemGroup>
+	<ItemGroup>
+		<None Update="My Project\Settings.settings">
+			<CustomToolNamespace>My</CustomToolNamespace>
+			<Generator>SettingsSingleFileGenerator</Generator>
+			<LastGenOutput>Settings.Designer.vb</LastGenOutput>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
     <Service Include="{94e38dff-614b-4cbd-b67c-f211bb35ce8b}" />
   </ItemGroup>
 </Project>

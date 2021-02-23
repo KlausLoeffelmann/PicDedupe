@@ -11,6 +11,10 @@
             .Description = DialogTitel
         }
 
+        If Not String.IsNullOrWhiteSpace(BrowserPath) Then
+            folderBrowser.SelectedPath = BrowserPath
+        End If
+
         Dim dialogResult = folderBrowser.ShowDialog()
         If dialogResult = DialogResult.OK Then
             Path = folderBrowser.SelectedPath
@@ -27,6 +31,8 @@
             End If
         End Set
     End Property
+
+    Public Property BrowserPath As String
 
     Public Property Path As String
         Get

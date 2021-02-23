@@ -1,4 +1,5 @@
 ﻿Imports PicDedupe.Controls
+Imports PicDedupe.Framework.My
 Imports PicDedupe.Generic
 
 Public Class FormMain
@@ -31,6 +32,10 @@ Public Class FormMain
 
         AddHandler _timer.Tick, Sub() CurrentTime.Text = $"Time: {Now.ToLongTimeString}"
         AddHandler _doubletFinder.FileDoubletFound, AddressOf DoubletFinder_FileDoubletFound
+        AddHandler doubletsTreeView.RequestSetting, Sub(sender, e)
+                                                        e.Value = MySettings.Default(e.Key)
+                                                    End Sub
+        AddHandler doubletsTreeView.WriteSetting, Sub(sender, e) MySettings.Default(e.Key) = e.Value
     End Sub
 
     Private Async Sub FileCrawlerPathPicker_PathChanged(sender As Object, e As PathChangedEventArgs) Handles fileCrawlerPathPicker.PathChanged

@@ -53,6 +53,30 @@ Namespace My
                 Return defaultInstance
             End Get
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("")>  _
+        Public Property LastSearchPath() As String
+            Get
+                Return CType(Me("LastSearchPath"),String)
+            End Get
+            Set
+                Me("LastSearchPath") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("")>  _
+        Public Property LastMoveDoubletsToPath() As String
+            Get
+                Return CType(Me("LastMoveDoubletsToPath"),String)
+            End Get
+            Set
+                Me("LastMoveDoubletsToPath") = value
+            End Set
+        End Property
     End Class
 End Namespace
 

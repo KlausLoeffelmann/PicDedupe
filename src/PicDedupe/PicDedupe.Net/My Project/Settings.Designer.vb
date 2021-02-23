@@ -56,25 +56,25 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("Test")>  _
-        Public Property TestValue() As String
+         Global.System.Configuration.DefaultSettingValueAttribute("")>  _
+        Public Property LastSearchPath() As String
             Get
-                Return CType(Me("TestValue"),String)
+                Return CType(Me("LastSearchPath"),String)
             End Get
             Set
-                Me("TestValue") = value
+                Me("LastSearchPath") = value
             End Set
         End Property
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("1234")>  _
-        Public Property Test2Value() As String
+         Global.System.Configuration.DefaultSettingValueAttribute("")>  _
+        Public Property LastMoveDoubletsToPath() As String
             Get
-                Return CType(Me("Test2Value"),String)
+                Return CType(Me("LastMoveDoubletsToPath"),String)
             End Get
             Set
-                Me("Test2Value") = value
+                Me("LastMoveDoubletsToPath") = value
             End Set
         End Property
     End Class

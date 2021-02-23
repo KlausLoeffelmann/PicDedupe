@@ -79,6 +79,7 @@ Public Class FileDoubletFinder
                 file.LinkedTo = fileToCompare
                 eventArgs = New FileDoubletFoundEventArgs(file)
                 RaiseEvent FileDoubletFound(Me, eventArgs)
+                Exit For
             Next
             fileDoubletList.Add(file)
         Catch ex As Exception

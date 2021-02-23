@@ -1,5 +1,4 @@
 ﻿Imports System.Collections.Immutable
-Imports System.ComponentModel
 Imports System.Text
 Imports PicDedupe.Generic
 
@@ -12,6 +11,9 @@ Public Class FileEntryTreeView
     Friend WithEvents _tsmCopyFilenameToClipboard As ToolStripMenuItem
     Friend WithEvents _tsmCreateDeleteBatchInClipboard As ToolStripMenuItem
     Friend WithEvents _tsmCreateCopyBatchInClipboard As ToolStripMenuItem
+
+    Public Event RequestSetting(sender As Object, eventArgs As SettingsEventArgs)
+    Public Event WriteSetting(sender As Object, eventArgs As SettingsEventArgs)
 
     Private Sub CopyFilenameToClipboard_Click(sender As Object, e As EventArgs)
     End Sub
@@ -27,19 +29,36 @@ Public Class FileEntryTreeView
 #If NET5_0_OR_GREATER Then
         folderDialog.UseDescriptionForTitle = True
 #End If
+        Dim settingsEventArgs = New SettingsEventArgs("LastMoveDoubletsToPath")
+
+        ' This is one of the easiest way to request a Settings inside a 
+        ' Class Library from the Main app. A more sophisticated way would be, 
+        ' to Inject the Settings class or comeup with a custom 
+        ' Settings Reader/Writer. For this purpose, it suffices.
+        ' Bing for: https://tinyurl.com/42bjajz7
+
+        RaiseEvent RequestSetting(Me, settingsEventArgs)
+        If Not String.IsNullOrWhiteSpace(settingsEventArgs.Value?.ToString) Then
+            folderDialog.SelectedPath = settingsEventArgs.Value?.ToString
+        End If
 
         Dim dialogResult = folderDialog.ShowDialog
         If dialogResult <> DialogResult.OK Then
             Return
         End If
 
-        Dim files = GetDoublets()
+        settingsEventArgs.Value = folderDialog.SelectedPath
+        RaiseEvent WriteSetting(Me, settingsEventArgs)
+
         Dim stringBuilder = New StringBuilder
         With stringBuilder
             .AppendLine($"set ""DestPath={folderDialog.SelectedPath}""")
             .AppendLine()
-            For Each fileItem In files
-                .AppendLine($"move ""{fileItem.Path}"" ""%DestPath%""")
+            For Each node As FileEntryTreeViewNode In MyBase.Nodes
+                For Each innerNode As FileEntryTreeViewNode In node.Nodes
+                    .AppendLine($"move ""{innerNode.FileEntry.Path}"" ""%DestPath%""")
+                Next
+                .AppendLine()
             Next
         End With
         Clipboard.SetText(stringBuilder.ToString)
@@ -76,7 +95,18 @@ Public Class FileEntryTreeView
             parentTreeNode.Nodes.Add(New FileEntryTreeViewNode(doublet))
             MyBase.Nodes.Add(parentTreeNode)
             Return
+        Else
+            ' Let's find the top of the chain...
+            Do While (parentNode.LinkedTo IsNot Nothing)
+                parentNode = parentNode.LinkedTo
+            Loop
+            '...this is the reference to our top treeview node, where we can add the doublet we just found.
+            DirectCast(parentNode.Tag, FileEntryTreeViewNode).Nodes.Add(New FileEntryTreeViewNode(doublet))
+            If doublet.Path = "F:\Project Pics\Dustin\winforms-designer\src\System.Design.Core\WinForms\Resources\System\WinForms\Design\colorful1.bmp" Then
+                Stop
+            End If
         End If
+
     End Sub
 
     Public Function GetDoublets() As ImmutableList(Of FileEntry)
