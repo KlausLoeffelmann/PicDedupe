@@ -64,20 +64,18 @@ Public Class FileEntryTreeView
 
     End Sub
 
-    Public Sub AddDoublet(doublet As FileEntry, fileComparedAgainst As FileEntry)
+    Public Sub AddDoublet(doublet As FileEntry)
 
-        Dim doubletNode As FileEntryTreeViewNode = Nothing
+        ' Let's get the file this is the doublet to.
+        Dim parentNode = doublet.LinkedTo
 
-        Dim newNode = New FileEntryTreeViewNode(doublet)
-
-        If _doubletNodes.TryGetValue(doublet.Length, doubletNode) Then
-            doubletNode.Nodes.Add(newNode)
-        Else
-            Dim originalFileNode = New FileEntryTreeViewNode(fileComparedAgainst)
-            MyBase.Nodes.Add(originalFileNode)
-            originalFileNode.Expand()
-            originalFileNode.Nodes.Add(newNode)
-            _doubletNodes.Add(doublet.Length, originalFileNode)
+        ' We have no treenode yet, so...
+        If parentNode.Tag Is Nothing Then
+            Dim parentTreeNode = New FileEntryTreeViewNode(parentNode)
+            parentNode.Tag = parentTreeNode
+            parentTreeNode.Nodes.Add(New FileEntryTreeViewNode(doublet))
+            MyBase.Nodes.Add(parentTreeNode)
+            Return
         End If
     End Sub
 
@@ -95,6 +93,10 @@ Public Class FileEntryTreeView
             Return MyBase.Nodes.Cast(Of FileEntryTreeViewNode).ToImmutableList
         End Get
     End Property
+
+    Public Sub ClearNodes()
+        Nodes.Clear()
+    End Sub
 
     Private Sub InitializeComponents()
         Me._doublettenContextMenu = New System.Windows.Forms.ContextMenuStrip()

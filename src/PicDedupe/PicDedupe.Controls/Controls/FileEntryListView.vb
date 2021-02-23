@@ -1,7 +1,7 @@
 ﻿Imports System.IO
 Imports System.Windows.Forms
 
-Public Class FileEntryView
+Public Class FileEntryListView
     Inherits ListView
 
     Private _imageList As ImageList = New ImageList

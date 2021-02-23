@@ -6,8 +6,6 @@ Public Class FileCrawler
     Public Event TopLevelDirectoriesAvailable(sender As Object, e As TopLevelDirectoriesAvailableEventArgs)
     Public Event ProgressUpdate(sender As Object, e As ProgressUpdateEventArgs)
 
-    Private Const DefaultFilesSearchPattern = "*.cs|*.vb|*.csproj|*.vbproj|*.sln|*.ico|*.bmp|*.png|*.jpg|*.gif|*.resx|*.xml"
-
     Private ReadOnly _startPath As String
     Private ReadOnly _searchPattern As String()
 
@@ -22,8 +20,6 @@ Public Class FileCrawler
         If Not New DirectoryInfo(startPath).Exists Then
             Throw New DirectoryNotFoundException($"Directory {startPath} does not exist.")
         End If
-
-        searchPattern = If(searchPattern, GetSearchPatternArray(DefaultFilesSearchPattern))
 
         _startPath = startPath
         _searchPattern = searchPattern
@@ -43,12 +39,16 @@ Public Class FileCrawler
 
         _fileEntryTree = New FileEntryTree(_startPath)
 
-        If _searchPattern.Any(Function(searchPattern) searchPattern = ".*") Then
-            entryFilter = Function(entry) True
-        Else
-            entryFilter = Function(entry) entry.IsDirectory OrElse
-                                          _searchPattern.Any(Function(searchPattern) searchPattern = Path.GetExtension(entry.Path).ToLower)
-        End If
+        entryFilter = Function(entry) True
+
+        'This code was for filtering, if we needed it at this point.
+        'But we don't. We do the filtering in the DoubletFinder.
+
+        'If _searchPattern.Any(Function(searchPattern) searchPattern = ".*") Then
+        'Else
+        '    entryFilter = Function(entry) entry.IsDirectory OrElse
+        '                                  _searchPattern.Any(Function(searchPattern) searchPattern = Path.GetExtension(entry.Path).ToLower)
+        'End If
 
         Dim topLevelDirectoriesAvailableFired = False
         Dim fileCount As Integer = 0

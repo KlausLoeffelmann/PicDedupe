@@ -38,7 +38,7 @@ Public Class FormMain
     End Sub
 
     Private Sub DoubletFinder_FileDoubletFound(sender As Object, e As FileDoubletFoundEventArgs)
-        Invoke(Sub() doubletsTreeView.AddDoublet(e.FileFound, e.DoubletList(0)))
+        Invoke(Sub() doubletsTreeView.AddDoublet(e.FileFound))
     End Sub
 
     Private Sub FileCrawler_ProgressUpdate(sender As Object, e As ProgressUpdateEventArgs)
@@ -76,6 +76,9 @@ Public Class FormMain
         _stopWatch = Diagnostics.Stopwatch.StartNew
         _lastUpdate = _stopWatch.ElapsedMilliseconds
 
+        fileCrawlerFolderListView.Items.Clear()
+        doubletsTreeView.ClearNodes()
+
         _fileCrawler = New FileCrawler(path)
         _fileCrawler.DoubletFinder = _doubletFinder
 
@@ -98,7 +101,7 @@ Public Class FormMain
 
     Private Sub UpdateStatusBar(directoryNode As FileEntryNode, Optional isDone As Boolean = False)
         TotalFileSize.Text = $"Total file size: {CType(directoryNode.Length, MemorySize)}"
-        TotalFileCount.Text = $"Total file count: {directoryNode.FileCount:#,##0)}"
+        TotalFileCount.Text = $"Total file count: {directoryNode.FileCount:#,##0}"
         ElapsedTime.Text = $"{If(isDone, "Done after: ", "Elapsed time: ")}{_stopWatch.Elapsed:hh\:mm\:ss}"
 
         If _stopWatch.Elapsed - _lastUpdateTime > New TimeSpan(0, 0, 0, 0, 200) Then

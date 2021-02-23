@@ -18,6 +18,8 @@ Public Class FileEntry
     Public Property Length As Long ' Can't be readonly, since the Length gets be accumulated while scanning folders.
 
     Public ReadOnly Property IsDirectory As Boolean
+    Public Property LinkedTo As FileEntry
+    Public Property Tag As Object
 
     Public Async Function GetFileHashAsync() _
         As Task(Of Byte())

@@ -4,18 +4,33 @@ Imports System.IO
 
 Public Class FileDoubletFinder
 
+    'Private Const DefaultFilesSearchPattern = "*.cs|*.vb|*.csproj|*.vbproj|*.sln|*.ico|*.bmp|*.png|*.jpg|*.gif|*.resx|*.xml"
+    Private Const DefaultFilesSearchPattern = "*.bmp|*.png|*.jpg|*.jpeg|*.gif|*.ico|*.tif|*.tiff|*.raw|*.arw|*.heic|*.nef|*.cr2"
+
     Private ReadOnly _files As Dictionary(Of Long, List(Of FileEntry))
+    Private ReadOnly _entryFilter As Func(Of FileEntry, Boolean)
+    Private ReadOnly _searchPatternArray As String()
+
     Public Event FileDoubletFound(sender As Object, e As FileDoubletFoundEventArgs)
 
     Public Sub New()
         _files = New Dictionary(Of Long, List(Of FileEntry))
+        Dim eliminatedAsterisks = DefaultFilesSearchPattern.Replace("*", "")
+        _searchPatternArray = eliminatedAsterisks.Split("|"c)
+
+        _entryFilter = Function(entry) _searchPatternArray.Any(
+            Function(searchPattern) searchPattern = Path.GetExtension(entry.Path).ToLower)
+
     End Sub
 
     Public Async Function AddFileAsync(file As FileEntry) As Task
         Try
-
             Dim eventArgs As FileDoubletFoundEventArgs
             Dim fileDoubletList As List(Of FileEntry) = Nothing
+
+            If Not _entryFilter(file) Then
+                Return
+            End If
 
             If file.Length < IgnoreFilesSmallerThan Then
                 Return
@@ -28,43 +43,44 @@ Public Class FileDoubletFinder
                 Return
             End If
 
-            If TakeFilenameIntoAccount Then
-                Dim firstFileFound = Path.GetFileNameWithoutExtension(fileDoubletList(0).Path)
-                Dim thisFile = Path.GetFileNameWithoutExtension(file.Path)
+            For Each fileToCompare In fileDoubletList
+                If TakeFilenameIntoAccount Then
+                    Dim fileToComparePath = Path.GetFileNameWithoutExtension(fileToCompare.Path)
+                    Dim thisFilePath = Path.GetFileNameWithoutExtension(file.Path)
 
-                ' Let's test if the shorter filename matches the longer at one point:
-                ' (like 'firstphoto' and 'firstphoto(2)').
-                If firstFileFound.Length < thisFile.Length Then
-                    firstFileFound = thisFile
-                    thisFile = Path.GetFileNameWithoutExtension(fileDoubletList(0).Path)
+                    ' Let's test if the shorter filename matches the longer at one point:
+                    ' (like 'firstphoto' and 'firstphoto(2)').
+                    If fileToComparePath.Length < thisFilePath.Length Then
+                        Dim temp = fileToComparePath
+                        fileToComparePath = thisFilePath
+                        thisFilePath = Path.GetFileNameWithoutExtension(fileDoubletList(0).Path)
+                        fileToComparePath = temp
+                    End If
+
+                    'if it doesn't, we don't consider it a doublet, and return.
+                    If fileToComparePath.IndexOf(thisFilePath) = -1 Then
+                        Continue For
+                    End If
                 End If
 
-                'if it doesn't, we don't consider it a doublet, and return.
-                If firstFileFound.IndexOf(thisFile) = -1 Then
-                    Return
-                End If
-            End If
+                If file.Length < CompleteFileHashThreshold Then
+                    Dim firstFileFoundHashTask = fileToCompare.GetFileHashAsync
+                    Dim currentFileFoundHashTask = file.GetFileHashAsync
 
-            If file.Length < CompleteFileHashThreshold Then
-                Dim firstFileFoundHashTask = fileDoubletList(0).GetFileHashAsync
-                Dim currentFileFoundHashTask = file.GetFileHashAsync
+                    Await Task.WhenAll(firstFileFoundHashTask, currentFileFoundHashTask)
 
-                Await Task.WhenAll(firstFileFoundHashTask, currentFileFoundHashTask)
-
-                If Not QuickCompareHashes(
-                    firstFileFoundHashTask.Result,
-                    currentFileFoundHashTask.Result) Then
-                    Return
+                    If Not QuickCompareHashes(
+                        firstFileFoundHashTask.Result,
+                        currentFileFoundHashTask.Result) Then
+                        Continue For
+                    End If
                 End If
 
-            End If
-
-            eventArgs = New FileDoubletFoundEventArgs(file, fileDoubletList.ToImmutableList)
-            RaiseEvent FileDoubletFound(Me, eventArgs)
-
-            If Not eventArgs.Cancel Then
-                fileDoubletList.Add(file)
-            End If
+                file.LinkedTo = fileToCompare
+                eventArgs = New FileDoubletFoundEventArgs(file)
+                RaiseEvent FileDoubletFound(Me, eventArgs)
+            Next
+            fileDoubletList.Add(file)
         Catch ex As Exception
             Stop
         End Try
@@ -84,16 +100,4 @@ Public Class FileDoubletFinder
     Public Property IgnoreFilesSmallerThan As Long = 65535
     Public Property TakeFilenameIntoAccount As Boolean = True
 
-End Class
-
-Public Class FileDoubletFoundEventArgs
-    Inherits CancelEventArgs
-
-    Sub New(fileFound As FileEntry, doubletList As ImmutableList(Of FileEntry))
-        Me.FileFound = fileFound
-        Me.DoubletList = doubletList
-    End Sub
-
-    Public Property FileFound As FileEntry
-    Public Property DoubletList As ImmutableList(Of FileEntry)
 End Class

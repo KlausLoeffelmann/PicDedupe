@@ -9,6 +9,7 @@ Public Class PictureViewerForm
 
         ' This call is required by the designer.
         InitializeComponent()
+        PictureViewer1.FitWindow = True
     End Sub
 
     ' So, we want to show a picture in a Form that we pass,
@@ -22,6 +23,7 @@ Public Class PictureViewerForm
     ' Shared (so static) method, and show it. So far, so good. Now...
     Public Shared Sub ShowPicture(imageFile As FileInfo)
         Dim formInstance = New PictureViewerForm(imageFile)
+        formInstance.Text = imageFile.FullName
         formInstance.Show()
     End Sub
 
@@ -54,4 +56,11 @@ Public Class PictureViewerForm
             End Sub)
     End Sub
 
+    Private Sub TsbFitPage_Click(sender As Object, e As EventArgs) Handles tsbFitPage.Click
+        PictureViewer1.FitWindow = True
+    End Sub
+
+    Private Sub TsbOriginalSize_Click(sender As Object, e As EventArgs) Handles tsbOriginalSize.Click
+        PictureViewer1.FitWindow = False
+    End Sub
 End Class
