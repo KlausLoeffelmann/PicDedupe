@@ -16,27 +16,6 @@ Friend Class ImageLoader
 
     Private Shared ReadOnly s_parallelOptions As ParallelOptions
 
-    Shared Sub New()
-
-        Dim maxDegreeOfParallelism As Integer
-
-        Select Case Environment.ProcessorCount
-            Case 1, 2
-                maxDegreeOfParallelism = 1
-            Case 3, 4
-                maxDegreeOfParallelism = 2
-            Case 4 To 8
-                maxDegreeOfParallelism = Environment.ProcessorCount \ 2
-            Case 8 To 32
-                maxDegreeOfParallelism = Environment.ProcessorCount \ 4
-            Case > 32
-                maxDegreeOfParallelism = 10
-            Case Else
-                Throw New Exception("This machine doesn't seem to have a processor.")
-                Exit Select
-        End Select
-    End Sub
-
     Public Shared Async Function LoadThumbnailAsync(ByVal imageFile As FileEntry) As Task(Of Bitmap)
         Dim storageItemThumbnailStream As IRandomAccessStream
         Dim file As StorageFile = Await StorageFile.GetFileFromPathAsync(imageFile.Path)
@@ -136,5 +115,32 @@ Friend Class ImageLoader
         bitmap.UnlockBits(bitmapData)
         Return bitmap
     End Function
+
+    Shared Sub New()
+
+        Dim maxDegreeOfParallelism As Integer
+
+        Select Case Environment.ProcessorCount
+            Case 1, 2
+                maxDegreeOfParallelism = 1
+            Case 3, 4
+                maxDegreeOfParallelism = 2
+            Case 4 To 8
+                maxDegreeOfParallelism = Environment.ProcessorCount \ 2
+            Case 8 To 32
+                maxDegreeOfParallelism = Environment.ProcessorCount \ 4
+            Case > 32
+                maxDegreeOfParallelism = 10
+            Case Else
+                Throw New Exception("This machine doesn't seem to have a processor.")
+                Exit Select
+        End Select
+
+        s_parallelOptions = New ParallelOptions() With
+        {
+            .MaxDegreeOfParallelism = maxDegreeOfParallelism
+        }
+    End Sub
+
 End Class
 #End If

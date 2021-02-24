@@ -100,6 +100,7 @@ Public Class FormMain
         fileCrawlerFolderListView.Items.Clear()
         doubletsTreeView.ClearNodes()
 
+        ' Enable, for using the LIGHtNING-FAST .NET 5 File-Crawler-Version!
         If chkUseNetEnumerator.Checked Then
             _fileCrawler.FileItemEnumerator = New LightningFastFileItemEnumerator()
         End If

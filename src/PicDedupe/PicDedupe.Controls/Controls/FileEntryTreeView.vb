@@ -102,9 +102,6 @@ Public Class FileEntryTreeView
             Loop
             '...this is the reference to our top treeview node, where we can add the doublet we just found.
             DirectCast(parentNode.Tag, FileEntryTreeViewNode).Nodes.Add(New FileEntryTreeViewNode(doublet))
-            If doublet.Path = "F:\Project Pics\Dustin\winforms-designer\src\System.Design.Core\WinForms\Resources\System\WinForms\Design\colorful1.bmp" Then
-                Stop
-            End If
         End If
 
     End Sub

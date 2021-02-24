@@ -51,7 +51,6 @@ Public Class PictureViewerForm
                 Try
                     Await Me.PictureViewer1.LoadImageAsync(_imageFile)
                 Catch ex As Exception
-                    Throw
                 End Try
             End Sub)
     End Sub

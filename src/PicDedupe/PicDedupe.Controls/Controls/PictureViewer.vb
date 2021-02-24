@@ -5,12 +5,40 @@ Public Class PictureViewer
     Private _lastException As Exception
     Private _fitWindow As Boolean
 
+    Sub New()
+
+        ' This call is required by the designer.
+        InitializeComponent()
+
+        ' Add any initialization after the InitializeComponent() call.
+        AddHandler pictureBox.Paint,
+            Sub(sender, e)
+                If _lastException IsNot Nothing Then
+                    Dim errorMessage = $"Sorry - while trying to show the Pic,{vbNewLine}an unexpected exception happend.{vbNewLine}The Picture Format was not recognized."
+
+                    Dim size = e.Graphics.MeasureString(errorMessage, Font, Width \ 3 * 2)
+                    Dim location = New Point(
+                        Width \ 2 - CInt(size.Width) \ 2,
+                        Height \ 2 - CInt(size.Height) \ 2)
+
+                    e.Graphics.DrawString(
+                    errorMessage,
+                    Font,
+                    Brushes.Black,
+                    location)
+                End If
+            End Sub
+    End Sub
+
     Public Async Function LoadImageAsync(fileInfo As FileInfo) As Task
         Dim imageAndException = Await ImageLoader.LoadImageAsync(fileInfo)
         If imageAndException.exception IsNot Nothing Then
-            pictureBox.Image = Nothing
             _lastException = imageAndException.exception
+            pictureBox.Image = Nothing
+            PerformLayout()
+            Invalidate()
         Else
+            _lastException = Nothing
             pictureBox.Image = imageAndException.image
         End If
     End Function
@@ -30,7 +58,7 @@ Public Class PictureViewer
     Protected Overrides Sub OnLayout(e As LayoutEventArgs)
         MyBase.OnLayout(e)
 
-        If FitWindow Then
+        If FitWindow OrElse _lastException IsNot Nothing Then
             Me.AutoScroll = False
             pictureBox.SizeMode = PictureBoxSizeMode.Zoom
             pictureBox.Location = New Point(0, 0)
@@ -44,7 +72,7 @@ Public Class PictureViewer
 
             pictureBox.Size = pictureBox.Image.Size
 
-        Dim x, y As Integer
+            Dim x, y As Integer
 
             With Me.ClientRectangle
                 If pictureBox.Width < .Width Then

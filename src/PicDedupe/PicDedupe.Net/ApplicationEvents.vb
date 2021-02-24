@@ -18,7 +18,7 @@ Namespace My
 
     Partial Friend Class MyApplication
         Private Sub MyApplication_ApplyHighDpiMode(sender As Object, e As ApplyHighDpiModeEventArgs) Handles Me.ApplyHighDpiMode
-
+            e.HighDpiMode = HighDpiMode.SystemAware
         End Sub
     End Class
 End Namespace
