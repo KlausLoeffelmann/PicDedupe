@@ -1,4 +1,4 @@
-﻿#If NET461_OR_GREATER Then
+﻿'#If NET461_OR_GREATER Then
 Imports System.IO
 Imports PicDedupe.Generic
 
@@ -12,4 +12,4 @@ Friend Class ImageLoader
         End Try
     End Function
 End Class
-#End If
+'#End If

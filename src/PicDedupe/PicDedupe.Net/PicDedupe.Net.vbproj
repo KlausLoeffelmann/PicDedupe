@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
       <!--<10.0.19041.0>-->
-	  <TargetFramework>net5.0-windows10.0.19041.0</TargetFramework>
+	  <TargetFramework>net5.0-windows</TargetFramework>
 	  <RootNamespace>PicDedupe.Net</RootNamespace>
     <StartupObject>Sub Main</StartupObject>
     <UseWindowsForms>true</UseWindowsForms>

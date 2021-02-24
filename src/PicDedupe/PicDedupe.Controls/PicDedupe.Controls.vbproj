@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<!--<TargetFrameworks></TargetFrameworks>-->
-		<TargetFrameworks>net4.8;net5.0-windows10.0.19041.0</TargetFrameworks>
+		<!--<TargetFrameworks>10.0.19041.0</TargetFrameworks>-->
+		<TargetFrameworks>net4.8;net5.0-windows</TargetFrameworks>
 		<RootNamespace>PicDedupe.Controls</RootNamespace>
 		<UseWindowsForms>true</UseWindowsForms>
 		<MyType>WindowsForms</MyType>
