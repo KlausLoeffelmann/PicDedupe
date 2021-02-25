@@ -106,18 +106,11 @@ Public Class FileEntryTreeView
 
     End Sub
 
-    Public Function GetDoublets() As ImmutableList(Of FileEntry)
-        Return (From nodesItem In _doubletNodes
-                Where nodesItem.Value.Nodes.Count > 0
-                From fileNodeItem In nodesItem.Value.Nodes.Cast(Of FileEntryTreeViewNode)
-                Select fileNodeItem.FileEntry).ToImmutableList
-    End Function
-
     ' We're blocking complete write access to that, so that only AddDoublet and RemoveDoublet
     ' can be used to maintain the Nodes under the covers.
-    Shadows ReadOnly Property Nodes() As ImmutableList(Of FileEntryTreeViewNode)
+    Shadows ReadOnly Property Nodes() As List(Of FileEntryTreeViewNode)
         Get
-            Return MyBase.Nodes.Cast(Of FileEntryTreeViewNode).ToImmutableList
+            Return MyBase.Nodes.Cast(Of FileEntryTreeViewNode).ToList
         End Get
     End Property
 

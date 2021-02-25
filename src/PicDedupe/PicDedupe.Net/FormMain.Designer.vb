@@ -16,22 +16,6 @@ Partial Class FormMain
         End Try
     End Sub
 
-    Private Sub CopyFilenameToClipboard_Click(sender As Object, e As EventArgs)
-    End Sub
-
-    Private Sub CreateCopyBatchInClipboard_Click(sender As Object, e As EventArgs)
-        Dim files = doubletsTreeView.GetDoublets
-        Dim stringBuilder = New StringBuilder
-        With stringBuilder
-            .AppendLine($"set ""DestPath=c:\temp\copytarget\""")
-            .AppendLine()
-            For Each fileItem In files
-                .AppendLine($"move ""{fileItem.Path}"" ""%DestPath%""")
-            Next
-        End With
-        Clipboard.SetText(stringBuilder.ToString)
-    End Sub
-
     'Required by the Windows Form Designer
     Private components As System.ComponentModel.IContainer
 
@@ -185,7 +169,7 @@ Partial Class FormMain
         Me.Controls.Add(Me.folderSplitter)
         Me.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
         Me.Name = "FormMain"
-        Me.Text = "PicDedupe"
+        Me.Text = "PicDedupe - .NET 5"
         Me.folderSplitter.Panel1.ResumeLayout(False)
         Me.folderSplitter.Panel2.ResumeLayout(False)
         CType(Me.folderSplitter, System.ComponentModel.ISupportInitialize).EndInit()

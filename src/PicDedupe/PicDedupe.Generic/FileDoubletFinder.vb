@@ -1,6 +1,4 @@
-﻿Imports System.Collections.Immutable    ' We can use this in .NET 4.8, since we added the NuGet System.Collection.Immutable
-Imports System.ComponentModel
-Imports System.IO
+﻿Imports System.IO
 
 Public Class FileDoubletFinder
 
@@ -91,8 +89,8 @@ Public Class FileDoubletFinder
         firstBytes As Byte(),
         secondBytes As Byte()) As Boolean
 
-        Dim firstBytesSpan = firstBytes.AsSpan
-        Dim secondBytesSpan = secondBytes.AsSpan
+        Dim firstBytesSpan = firstBytes
+        Dim secondBytesSpan = secondBytes
 
         Return firstBytesSpan.SequenceEqual(secondBytesSpan)
     End Function
