@@ -2,6 +2,9 @@
 
 This was the Visual Basic Sample for Kathleen Dollard's and my Visual Basic talk on .NET Conf 2021 on Feb. 25th, 2021.
 
+![image](https://user-images.githubusercontent.com/9663150/109355175-af9e8980-7833-11eb-9a69-bb963b4b150e.png)
+
+
 * This Demo is completely written in VB. It doesn't use any P/Invokes and it does not fall back to C# libs.
 * A Framework Version and a .NET 5 Version share the same class libraries, and have the same exact same Form's code, but show the Display and Performance differences between both versions. Which are significantly. Please explore yourselves! 
 * The App demonstrates how to use multitargeted Class Libraries in VB for easyand risk-free  Migration purposes.
