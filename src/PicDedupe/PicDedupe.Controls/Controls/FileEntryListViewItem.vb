@@ -15,6 +15,7 @@ Public Class FileEntryListViewItem
 
     Public Sub New(node As FileEntryNode)
         MyBase.New(node.Name, If(node.IsDirectory, "Folder", "Doc"))
+
         Dim subitem = SubItems.Add(s_fileCountFormatter(node.FileCount)) ' File Count
         subitem = SubItems.Add($"{CType(node.Length, MemorySize)}") ' Folder Size
         _node = node

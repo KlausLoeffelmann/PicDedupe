@@ -33,6 +33,7 @@ Public Class FormMain
         AddHandler _timer.Tick, Sub() CurrentTime.Text = $"Time: {Now.ToLongTimeString}"
         AddHandler _doubletFinder.FileDoubletFound, AddressOf DoubletFinder_FileDoubletFound
         AddHandler doubletsTreeView.RequestSetting, Sub(sender, e) e.Value = MySettings.Default(e.Key)
+
         AddHandler doubletsTreeView.WriteSetting, Sub(sender, e)
                                                       MySettings.Default(e.Key) = e.Value
                                                       My.Settings.Save()
@@ -97,8 +98,10 @@ Public Class FormMain
         fileCrawlerFolderListView.Items.Clear()
         doubletsTreeView.ClearNodes()
 
-        _fileCrawler = New FileCrawler(path)
-        _fileCrawler.DoubletFinder = _doubletFinder
+        _fileCrawler = New FileCrawler(path) With
+        {
+            .DoubletFinder = _doubletFinder
+        }
 
         fileCrawlerFolderListView.Items.Clear()
         doubletsTreeView.ClearNodes()
@@ -134,7 +137,11 @@ Public Class FormMain
             _lastItemCount = directoryNode.FileCount
         End If
     End Sub
-    Private Sub doubletsTreeView_NodeMouseDoubleClick(sender As Object, e As TreeNodeMouseClickEventArgs) Handles doubletsTreeView.NodeMouseDoubleClick
+
+    Private Sub DoubletsTreeView_NodeMouseDoubleClick(
+        sender As Object,
+        e As TreeNodeMouseClickEventArgs) Handles doubletsTreeView.NodeMouseDoubleClick
+
         PictureViewerForm.ShowPicture(New IO.FileInfo(DirectCast(e.Node, FileEntryTreeViewNode).FileEntry.Path))
     End Sub
 End Class

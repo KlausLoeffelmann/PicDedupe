@@ -100,7 +100,7 @@ Public Class FormMain
         fileCrawlerFolderListView.Items.Clear()
         doubletsTreeView.ClearNodes()
 
-        '' Enable, for using the LIGHtNING-FAST .NET 5 File-Crawler-Version!
+        '' Enable, for using the Lightning-Fast .NET 5 File-Crawler-Version!
         'If chkUseNetEnumerator.Checked Then
         '    _fileCrawler.FileItemEnumerator = New LightningFastFileItemEnumerator()
         'End If
@@ -137,7 +137,10 @@ Public Class FormMain
         End If
     End Sub
 
-    Private Sub doubletsTreeView_NodeMouseDoubleClick(sender As Object, e As TreeNodeMouseClickEventArgs) Handles doubletsTreeView.NodeMouseDoubleClick
+    Private Sub doubletsTreeView_NodeMouseDoubleClick(
+        sender As Object,
+        e As TreeNodeMouseClickEventArgs) Handles doubletsTreeView.NodeMouseDoubleClick
+
         PictureViewerForm.ShowPicture(New IO.FileInfo(DirectCast(e.Node, FileEntryTreeViewNode).FileEntry.Path))
     End Sub
 End Class

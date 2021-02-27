@@ -102,7 +102,7 @@
 '            New Rectangle(0, 0, bitmap.Width, bitmap.Height),
 '            ImageLockMode.ReadWrite, bitmap.PixelFormat)
 
-'        ' We need to reorgenize the Byte-Pattern.            
+'        ' We need to reorganize the Byte-Pattern.            
 '        Parallel.For(0, bitmapBytes.Length \ 4, s_parallelOptions,
 '                     Sub(i) ' * 4
 '                         Dim parallelForIndex = i << &B10

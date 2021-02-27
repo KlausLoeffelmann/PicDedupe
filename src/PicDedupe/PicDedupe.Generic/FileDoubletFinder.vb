@@ -22,6 +22,9 @@ Public Class FileDoubletFinder
     End Sub
 
     Public Async Function AddFileAsync(file As FileEntry) As Task
+
+        ' This algorithm is way too trivial for professional purposes.
+        ' But to find Double pics and for demo purposes, it does the trick!
         Try
             Dim eventArgs As FileDoubletFoundEventArgs
             Dim fileDoubletList As List(Of FileEntry) = Nothing
@@ -56,7 +59,7 @@ Public Class FileDoubletFinder
                     End If
 
                     'if it doesn't, we don't consider it a doublet, and return.
-                    If fileToComparePath.IndexOf(thisFilePath) = -1 Then
+                    If fileToComparePath.Contains(thisFilePath) Then
                         Continue For
                     End If
                 End If
@@ -81,11 +84,11 @@ Public Class FileDoubletFinder
             Next
             fileDoubletList.Add(file)
         Catch ex As Exception
-            Stop
+            'Stop
         End Try
     End Function
 
-    Public Function QuickCompareHashes(
+    Public Shared Function QuickCompareHashes(
         firstBytes As Byte(),
         secondBytes As Byte()) As Boolean
 

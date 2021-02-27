@@ -14,9 +14,7 @@ Public Class FileEntry
     End Sub
 
     Public ReadOnly Property Path As String
-
-    Public Property Length As Long ' Can't be readonly, since the Length gets be accumulated while scanning folders.
-
+    Public Property Length As Long
     Public ReadOnly Property IsDirectory As Boolean
     Public Property LinkedTo As FileEntry
     Public Property Tag As Object
@@ -24,6 +22,8 @@ Public Class FileEntry
     Public Async Function GetFileHashAsync() _
         As Task(Of Byte())
 
+        ' Here is another great example for things you could do in
+        ' .NET 5 but not in .NET Framework.
 #If NET5_0_OR_GREATER Then
         If _fileHash Is Nothing Then
             Dim sha256Calc = SHA256.Create()

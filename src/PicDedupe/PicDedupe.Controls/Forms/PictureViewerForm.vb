@@ -1,9 +1,8 @@
 ﻿Imports System.IO
-Imports PicDedupe.Generic
 
 Public Class PictureViewerForm
 
-    Private _imageFile As FileInfo
+    Private ReadOnly _imageFile As FileInfo
 
     Friend Sub New()
 
@@ -22,13 +21,16 @@ Public Class PictureViewerForm
     ' So, we are creating an instance of the Viewer Form in this
     ' Shared (so static) method, and show it. So far, so good. Now...
     Public Shared Sub ShowPicture(imageFile As FileInfo)
-        Dim formInstance = New PictureViewerForm(imageFile)
-        formInstance.Text = imageFile.FullName
+        Dim formInstance = New PictureViewerForm(imageFile) With
+        {
+            .Text = imageFile.FullName
+        }
+
         formInstance.Show()
     End Sub
 
     ' ...we are calling this second constructor, which makes sure,
-    ' we have a file. It instanciates the Form, which we then show...
+    ' we have a file. It instantiates the Form, which we then show...
     Friend Sub New(imageFile As FileInfo)
         Me.New()
         _imageFile = imageFile
@@ -36,16 +38,16 @@ Public Class PictureViewerForm
 
     ' ...and this at one point leads to the creation of the Form's handle.
     ' Now, this is what we need, to Invoke. Invoke needs a created Windows handle,
-    ' so CreateHandle is the earliest point in time, where es know, all the necessary
+    ' so CreateHandle is the earliest point in time, where we know, all the necessary
     ' infrastructure for the Form and for Invoking is in place.
-    ' Usually Invoking a method is used, to delegate it to the UI thread, and 
-    ' this is done by queing the call in the Windows' (Form's) MessageQueue. 
-    ' Well, we do right this, not to delegate to the UI thread, but then 
-    ' the MessageQueue Call-back becomes Event character,...
+    ' Usually Invoking a method is used to delegate the call to the UI thread, 
+    ' and this is done by queing the call in the Windows' (Form's) MessageQueue. 
+    ' Well, we do exactly this, but not to delegate to the UI thread, but rather because 
+    ' _then_ the MessageQueue call-back becomes Event character, ...
     Protected Overrides Sub CreateHandle()
         MyBase.CreateHandle()
 
-        ' ... from which we can kick-off all asynchronous calls! Voila!
+        ' ... from which we can kick-off all further asynchronous calls! Voila!
         Invoke(
             Async Sub()
                 Try

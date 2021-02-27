@@ -1,6 +1,8 @@
 ﻿Public Class ItemsPerSecondCalculator
+
     Private ReadOnly _elementQueue As New Queue(Of Integer)
     Private ReadOnly _bufferCount As Integer
+
     Private _overAllSum As Long
     Private _overAllElementCount As Integer
 
@@ -13,6 +15,7 @@
         If _elementQueue.Count > _bufferCount Then
             _elementQueue.Dequeue()
         End If
+
         _overAllElementCount += 1
         _overAllSum += element
     End Sub

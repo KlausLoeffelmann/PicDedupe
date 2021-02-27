@@ -1,11 +1,10 @@
-﻿Imports System.Collections.Immutable
-Imports System.Text
+﻿Imports System.Text
 Imports PicDedupe.Generic
 
 Public Class FileEntryTreeView
     Inherits TreeView
 
-    Private _doubletNodes As New Dictionary(Of Long, FileEntryTreeViewNode)
+    Private ReadOnly _doubletNodes As New Dictionary(Of Long, FileEntryTreeViewNode)
 
     Friend WithEvents _doublettenContextMenu As ContextMenuStrip
     Friend WithEvents _tsmCopyFilenameToClipboard As ToolStripMenuItem
@@ -16,6 +15,7 @@ Public Class FileEntryTreeView
     Public Event WriteSetting(sender As Object, eventArgs As SettingsEventArgs)
 
     Private Sub CopyFilenameToClipboard_Click(sender As Object, e As EventArgs)
+        'TODO: Let's implement this later. (PRs welcome! :-) )
     End Sub
 
     Private Sub CreateMoveBatchInClipboard_Click(sender As Object, e As EventArgs)
@@ -31,13 +31,14 @@ Public Class FileEntryTreeView
 #End If
         Dim settingsEventArgs = New SettingsEventArgs("LastMoveDoubletsToPath")
 
-        ' This is one of the easiest way to request a Settings inside a 
+        ' This is one of the easiest way to request a Setting inside a 
         ' Class Library from the Main app. A more sophisticated way would be, 
-        ' to Inject the Settings class or comeup with a custom 
+        ' to inject the Settings class or come up with a custom 
         ' Settings Reader/Writer. For this purpose, it suffices.
         ' Bing for: https://tinyurl.com/42bjajz7
 
         RaiseEvent RequestSetting(Me, settingsEventArgs)
+
         If Not String.IsNullOrWhiteSpace(settingsEventArgs.Value?.ToString) Then
             folderDialog.SelectedPath = settingsEventArgs.Value?.ToString
         End If
@@ -51,6 +52,7 @@ Public Class FileEntryTreeView
         RaiseEvent WriteSetting(Me, settingsEventArgs)
 
         Dim stringBuilder = New StringBuilder
+
         With stringBuilder
             .AppendLine($"set ""DestPath={folderDialog.SelectedPath}""")
             .AppendLine()
@@ -61,16 +63,17 @@ Public Class FileEntryTreeView
                 .AppendLine()
             Next
         End With
+
         Clipboard.SetText(stringBuilder.ToString)
     End Sub
 
     Protected Overrides Sub OnHandleCreated(e As EventArgs)
         MyBase.OnHandleCreated(e)
+
         InitializeComponents()
 
         AddHandler _tsmCopyFilenameToClipboard.Click, AddressOf CopyFilenameToClipboard_Click
         AddHandler _tsmCreateCopyBatchInClipboard.Click, AddressOf CreateMoveBatchInClipboard_Click
-
     End Sub
 
     Protected Overrides Sub OnDrawNode(e As DrawTreeNodeEventArgs)
@@ -80,7 +83,6 @@ Public Class FileEntryTreeView
         With e.Graphics
             e.DrawDefault = True
         End With
-
     End Sub
 
     Public Sub AddDoublet(doublet As FileEntry)
@@ -100,10 +102,10 @@ Public Class FileEntryTreeView
             Do While (parentNode.LinkedTo IsNot Nothing)
                 parentNode = parentNode.LinkedTo
             Loop
+
             '...this is the reference to our top treeview node, where we can add the doublet we just found.
             DirectCast(parentNode.Tag, FileEntryTreeViewNode).Nodes.Add(New FileEntryTreeViewNode(doublet))
         End If
-
     End Sub
 
     ' We're blocking complete write access to that, so that only AddDoublet and RemoveDoublet

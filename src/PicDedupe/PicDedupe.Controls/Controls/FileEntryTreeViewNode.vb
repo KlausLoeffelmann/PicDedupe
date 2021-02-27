@@ -9,7 +9,4 @@ Public Class FileEntryTreeViewNode
     End Sub
 
     Public ReadOnly Property FileEntry As FileEntry
-
-    Public ReadOnly IsHeader As Boolean
-
 End Class

@@ -6,7 +6,8 @@ Imports System.Security
 Public Class FileItemEnumerator
     Implements IFileItemEnumerator
 
-    Private Shared ReadOnly FileAttributeValues As FileAttributes() = [Enum].GetValues(GetType(FileAttributes)).Cast(Of FileAttributes).ToArray()
+    Private Shared ReadOnly FileAttributeValues As FileAttributes() =
+        [Enum].GetValues(GetType(FileAttributes)).Cast(Of FileAttributes).ToArray()
 
     Public Iterator Function EnumerateEntries(
         rootPath As String,
