@@ -1,6 +1,12 @@
 ﻿Imports PicDedupe.Controls
-Imports PicDedupe.Framework.My
 Imports PicDedupe.Generic
+
+'That is really the _only_ difference with the Forms!
+#If NET5_0_OR_GREATER Then
+Imports PicDedupe.Net.My
+#Else
+Imports PicDedupe.Framework.My
+#End If
 
 Public Class FormMain
 

@@ -1,7 +1,7 @@
 ﻿Imports System.Text
 
 <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
-Partial Class FormMain
+Partial Class FormMainOld
     Inherits System.Windows.Forms.Form
 
     'Form overrides dispose to clean up the component list.
@@ -53,7 +53,7 @@ Partial Class FormMain
         Me.fileCrawlerPathPicker.Margin = New System.Windows.Forms.Padding(2, 3, 2, 3)
         Me.fileCrawlerPathPicker.Name = "fileCrawlerPathPicker"
         Me.fileCrawlerPathPicker.Path = Nothing
-        Me.fileCrawlerPathPicker.Size = New System.Drawing.Size(1034, 38)
+        Me.fileCrawlerPathPicker.Size = New System.Drawing.Size(825, 38)
         Me.fileCrawlerPathPicker.TabIndex = 1
         '
         'folderSplitter

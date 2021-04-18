@@ -45,7 +45,7 @@ Partial Class FormMain
         Me.folderSplitter.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.folderSplitter.Location = New System.Drawing.Point(5, 58)
+        Me.folderSplitter.Location = New System.Drawing.Point(5, 72)
         Me.folderSplitter.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
         Me.folderSplitter.Name = "folderSplitter"
         Me.folderSplitter.Orientation = System.Windows.Forms.Orientation.Horizontal
@@ -57,8 +57,8 @@ Partial Class FormMain
         'folderSplitter.Panel2
         '
         Me.folderSplitter.Panel2.Controls.Add(Me.doubletsTreeView)
-        Me.folderSplitter.Size = New System.Drawing.Size(1065, 453)
-        Me.folderSplitter.SplitterDistance = 284
+        Me.folderSplitter.Size = New System.Drawing.Size(1065, 566)
+        Me.folderSplitter.SplitterDistance = 354
         Me.folderSplitter.SplitterWidth = 2
         Me.folderSplitter.TabIndex = 2
         '
@@ -70,7 +70,7 @@ Partial Class FormMain
         Me.fileCrawlerFolderListView.Location = New System.Drawing.Point(0, 0)
         Me.fileCrawlerFolderListView.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
         Me.fileCrawlerFolderListView.Name = "fileCrawlerFolderListView"
-        Me.fileCrawlerFolderListView.Size = New System.Drawing.Size(1065, 284)
+        Me.fileCrawlerFolderListView.Size = New System.Drawing.Size(1065, 354)
         Me.fileCrawlerFolderListView.TabIndex = 0
         Me.fileCrawlerFolderListView.UseCompatibleStateImageBehavior = False
         Me.fileCrawlerFolderListView.View = System.Windows.Forms.View.Details
@@ -82,14 +82,14 @@ Partial Class FormMain
         Me.doubletsTreeView.Location = New System.Drawing.Point(0, 0)
         Me.doubletsTreeView.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
         Me.doubletsTreeView.Name = "doubletsTreeView"
-        Me.doubletsTreeView.Size = New System.Drawing.Size(1065, 167)
+        Me.doubletsTreeView.Size = New System.Drawing.Size(1065, 210)
         Me.doubletsTreeView.TabIndex = 0
         '
         'StatusStrip1
         '
         Me.StatusStrip1.ImageScalingSize = New System.Drawing.Size(20, 20)
         Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.TotalFileSize, Me.TotalFileCount, Me.ElapsedTime, Me.ItemsPerSecondProcessed, Me.CurrentTime})
-        Me.StatusStrip1.Location = New System.Drawing.Point(0, 529)
+        Me.StatusStrip1.Location = New System.Drawing.Point(0, 668)
         Me.StatusStrip1.Name = "StatusStrip1"
         Me.StatusStrip1.Padding = New System.Windows.Forms.Padding(2, 0, 13, 0)
         Me.StatusStrip1.Size = New System.Drawing.Size(1083, 26)
@@ -99,30 +99,30 @@ Partial Class FormMain
         'TotalFileSize
         '
         Me.TotalFileSize.Name = "TotalFileSize"
-        Me.TotalFileSize.Size = New System.Drawing.Size(242, 20)
+        Me.TotalFileSize.Size = New System.Drawing.Size(233, 20)
         Me.TotalFileSize.Spring = True
         Me.TotalFileSize.Text = "Total file size: - - -"
         '
         'TotalFileCount
         '
         Me.TotalFileCount.Name = "TotalFileCount"
-        Me.TotalFileCount.Size = New System.Drawing.Size(242, 20)
+        Me.TotalFileCount.Size = New System.Drawing.Size(233, 20)
         Me.TotalFileCount.Spring = True
         Me.TotalFileCount.Text = "Total file count: - - -"
         '
         'ElapsedTime
         '
         Me.ElapsedTime.Name = "ElapsedTime"
-        Me.ElapsedTime.Size = New System.Drawing.Size(242, 20)
+        Me.ElapsedTime.Size = New System.Drawing.Size(233, 20)
         Me.ElapsedTime.Spring = True
         Me.ElapsedTime.Text = "Ellapsed Time: not started."
         '
         'ItemsPerSecondProcessed
         '
         Me.ItemsPerSecondProcessed.Name = "ItemsPerSecondProcessed"
-        Me.ItemsPerSecondProcessed.Size = New System.Drawing.Size(242, 20)
+        Me.ItemsPerSecondProcessed.Size = New System.Drawing.Size(233, 20)
         Me.ItemsPerSecondProcessed.Spring = True
-        Me.ItemsPerSecondProcessed.Text = "Items per sec:"
+        Me.ItemsPerSecondProcessed.Text = "Items per second:"
         '
         'CurrentTime
         '
@@ -136,18 +136,18 @@ Partial Class FormMain
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.fileCrawlerPathPicker.BrowserPath = Nothing
         Me.fileCrawlerPathPicker.DialogTitel = Nothing
-        Me.fileCrawlerPathPicker.Location = New System.Drawing.Point(5, 10)
+        Me.fileCrawlerPathPicker.Location = New System.Drawing.Point(5, 12)
         Me.fileCrawlerPathPicker.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
         Me.fileCrawlerPathPicker.Name = "fileCrawlerPathPicker"
         Me.fileCrawlerPathPicker.Path = Nothing
-        Me.fileCrawlerPathPicker.Size = New System.Drawing.Size(1065, 34)
+        Me.fileCrawlerPathPicker.Size = New System.Drawing.Size(1065, 42)
         Me.fileCrawlerPathPicker.TabIndex = 1
         '
         'FormMain
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1083, 555)
+        Me.ClientSize = New System.Drawing.Size(1083, 694)
         Me.Controls.Add(Me.StatusStrip1)
         Me.Controls.Add(Me.folderSplitter)
         Me.Controls.Add(Me.fileCrawlerPathPicker)

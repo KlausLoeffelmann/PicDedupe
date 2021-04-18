@@ -2,7 +2,7 @@
 Imports PicDedupe.Generic
 Imports PicDedupe.Net.My
 
-Public Class FormMain
+Public Class FormMainOld
 
     Private Const UpdateInterval = 100
 
@@ -101,9 +101,9 @@ Public Class FormMain
         doubletsTreeView.ClearNodes()
 
         '' Enable, for using the Lightning-Fast .NET 5 File-Crawler-Version!
-        'If chkUseNetEnumerator.Checked Then
-        '    _fileCrawler.FileItemEnumerator = New LightningFastFileItemEnumerator()
-        'End If
+        If chkUseNetEnumerator.Checked Then
+            _fileCrawler.FileItemEnumerator = New LightningFastFileItemEnumerator()
+        End If
 
         Dim directoryTree = Await Task.Run(
             Async Function()

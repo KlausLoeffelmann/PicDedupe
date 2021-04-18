@@ -98,8 +98,8 @@ Public Class FileDoubletFinder
         Return firstBytesSpan.SequenceEqual(secondBytesSpan)
     End Function
 
-    Public Property CompleteFileHashThreshold As Long = Long.MaxValue
-    Public Property IgnoreFilesSmallerThan As Long = 65535
+    Public Property CompleteFileHashThreshold As Long = UShort.MaxValue
+    Public Property IgnoreFilesSmallerThan As Long = 0
     Public Property TakeFilenameIntoAccount As Boolean = True
 
 End Class

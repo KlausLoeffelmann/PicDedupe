@@ -14,7 +14,7 @@ Public Class PictureViewer
         AddHandler pictureBox.Paint,
             Sub(sender, e)
                 If _lastException IsNot Nothing Then
-                    Dim errorMessage = $"Sorry - while trying to show the Pic,{vbNewLine}an unexpected exception happend.{vbNewLine}The Picture Format was not recognized."
+                    Dim errorMessage = $"Sorry - while trying to show the Pic,{vbCrLf}an unexpected exception happend.{vbCrLf}The Picture Format was not recognized."
 
                     Dim size = e.Graphics.MeasureString(errorMessage, Font, Width \ 3 * 2)
                     Dim location = New Point(

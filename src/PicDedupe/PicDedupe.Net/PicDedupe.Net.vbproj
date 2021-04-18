@@ -22,6 +22,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="..\PicDedupe.Framework\FormMain.Designer.vb" Link="FormMain.Designer.vb" />
+    <Compile Include="..\PicDedupe.Framework\FormMain.vb" Link="FormMain.vb" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="..\PicDedupe.Framework\FormMain.resx" Link="FormMain.resx" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Import Include="System.Data" />
     <Import Include="System.Drawing" />
     <Import Include="System.Windows.Forms" />
