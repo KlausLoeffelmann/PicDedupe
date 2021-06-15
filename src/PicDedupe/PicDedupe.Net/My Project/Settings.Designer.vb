@@ -15,7 +15,7 @@ Option Explicit On
 Namespace My
     
     <Global.System.Runtime.CompilerServices.CompilerGeneratedAttribute(),  _
-     Global.System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.8.1.0"),  _
+     Global.System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.10.0.0"),  _
      Global.System.ComponentModel.EditorBrowsableAttribute(Global.System.ComponentModel.EditorBrowsableState.Advanced)>  _
     Partial Friend NotInheritable Class MySettings
         Inherits Global.System.Configuration.ApplicationSettingsBase
@@ -75,6 +75,65 @@ Namespace My
             End Get
             Set
                 Me("LastMoveDoubletsToPath") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("True")>  _
+        Public Property TakeFileOfCertainSizeIntoAccount() As Boolean
+            Get
+                Return CType(Me("TakeFileOfCertainSizeIntoAccount"),Boolean)
+            End Get
+            Set
+                Me("TakeFileOfCertainSizeIntoAccount") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("True")>  _
+        Public Property TakeFilenameDifferencesIntoAccount() As Boolean
+            Get
+                Return CType(Me("TakeFilenameDifferencesIntoAccount"),Boolean)
+            End Get
+            Set
+                Me("TakeFilenameDifferencesIntoAccount") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("1")>  _
+        Public Property FileSizeToTakeIntoAccountInMBytes() As Decimal
+            Get
+                Return CType(Me("FileSizeToTakeIntoAccountInMBytes"),Decimal)
+            End Get
+            Set
+                Me("FileSizeToTakeIntoAccountInMBytes") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("1")>  _
+        Public Property FilesizeForNameDifferencesToTakeIntoAccountInMBytes() As Decimal
+            Get
+                Return CType(Me("FilesizeForNameDifferencesToTakeIntoAccountInMBytes"),Decimal)
+            End Get
+            Set
+                Me("FilesizeForNameDifferencesToTakeIntoAccountInMBytes") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute()>  _
+        Public Property FileTypeList() As Global.System.Collections.Specialized.StringCollection
+            Get
+                Return CType(Me("FileTypeList"),Global.System.Collections.Specialized.StringCollection)
+            End Get
+            Set
+                Me("FileTypeList") = value
             End Set
         End Property
     End Class
