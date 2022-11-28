@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<!--<TargetFrameworks>10.0.19041.0</TargetFrameworks>-->
-		<TargetFrameworks>net4.8;net5.0-windows</TargetFrameworks>
+		<TargetFrameworks>net4.8;net7.0-windows</TargetFrameworks>
 		<RootNamespace>PicDedupe.Controls</RootNamespace>
 		<UseWindowsForms>true</UseWindowsForms>
 		<MyType>WindowsForms</MyType>

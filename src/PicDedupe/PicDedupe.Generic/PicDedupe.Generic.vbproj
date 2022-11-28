@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <RootNamespace>PicDedupe.Generic</RootNamespace>
-    <TargetFrameworks>net4.8;net5.0-windows</TargetFrameworks>
+    <TargetFrameworks>net4.8;net7.0-windows</TargetFrameworks>
     <OptionStrict>On</OptionStrict>
   </PropertyGroup>
 
